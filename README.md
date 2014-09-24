@@ -27,6 +27,14 @@ More importantly, maually writing the code means duplication of effort, and dupl
 * **Flexible framework**. You can add more type support to the library by specializing certain template classes. In addition, whenever a class is generated, you can also parse/serialize an array of such class, a nullable wrapper of such class, another class that contains it, etc.
 * **Liberal licence**. Both the library and its dependency are licenced liberally (MIT or BSD-like). Anyone is free to copy, distribute, modify or include in their own projects, be it open source or commercial.
 
+## About libclang
+
+`libclang`'s interface has been changing, and its backwards compatibility is not very good. So for a general UNIX user, it is better to download the **latest** clang and llvm from http://www.llvm.org and build it yourself; your operating system's one is probably already too old in LLVM's world.
+
+For Mac users, as long as you have XCode and its command line tools installed, you already have the libclang needed (or at least I think so).
+
+For Windows users, may god help you.
+
 ## Testing
 
 [![Build Status](https://travis-ci.org/netheril96/autojsoncxx.svg?branch=master)](https://travis-ci.org/netheril96/autojsoncxx)
@@ -381,10 +389,44 @@ The 64-bit integer type `long long` and `unsigned long long` is always required.
 
 The default encoding is `UTF-8`. If you need to read/write JSON in `UTF-16` or `UTF-32`, instantiate the class `SAXEventHandler` and/or `Serializer`, and use it in combination with RapidJSON's transcoding capability.
 
-## Other
+## Options
 
-* You can have multiple definition of classes in the same file, simply by making the root an array of definitions.
-* Remember to fully qualify the type names or otherwise they may not be found. If the compiler still errs or warns about the namespaces, prefix it with global namespace scope resolution operator `::`, such as `::utility::event`, `::std::vector<::utility::event>`.
+If you need customization about how the parsing should be done, you can annotate the relevant classes and fields with `__attribute__((annotate("some annotation")))`. This is a GCC/Clang extension probably not supported by MSVC. So you can wrap it in a conditional defined macro and pass the appropriate flags to clang via command line `--args`.
+
+The annotation is a XML string with a root named `codegen`. XML is chosen over our favorite JSON here because embedding JSON in C++ source requires double and sometimes triple escaping, which is not easy to read or write.
+
+Currently the only option for class is `strict_parsing`. When set to `true`, this will treat any JSON key not specified in your class as an error (`UnknownFieldError`), otherwise it is simply skipped. The option in prettified XML is
+
+```xml
+<codegen>
+<strict_parsing>
+    true
+</strict_parsing>
+</codegen>
+```
+
+The syntax is a bit verbose to allow easy future expansion.
+
+There are three options for a field:
+
+* `required`: true or false (default: false). Whether the missing of such field triggers an error (`MissingFieldError`). Otherwise it is simply not written if the JSON does not contain such key.
+* `ignore`: true or false (default: failse). When set to true, this field is skipped in parsing and serialization. Mostly the same as `trasient` in Java.
+* `key`: arbitray string. The JSON key corresponding to the field. Don't quote it unless you need the quote. When left unspecified, it is the same as your declared variable name. Don't forget the XML entity escaping.
+
+See `test/userdef.hpp` for examples.
+ 
+## Private/Protected fields
+
+The read/write routines need access to the variables in your class. So if you need to parse/serialize non-public data, add friend declaration to your class. For example, if your class is named `MyClass`, add this to your declaration:
+
+```c++
+friend class autojsoncxx::SAXEventHandler<MyClass>;
+
+template <class Writer>
+friend class autojsoncxx::Serializer<Writer, MyClass>;
+```
+
+Doing so is not recommended, because bypassing access control may break your class invariant.
 
 ## To do
 

@@ -90,9 +90,9 @@ def hard_escape(text):
 def get_truth_value(element_node):
     if element_node is None:
         return False
-    if element_node.text.lower() == b'true':
+    if element_node.text.lower() == 'true':
         return True
-    if element_node.text.lower() == b'false':
+    if element_node.text.lower() == 'false':
         return False
 
     raise AnnotationError(element_node)
