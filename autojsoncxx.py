@@ -276,26 +276,26 @@ def main():
     parser.add_argument('-o', '--output', help='output file name for the generated header file', required=True)
     parser.add_argument('--args', action='append',
                         help='arguments passed to clang (e.g. "--args=-I../include --args=--std=c++11")')
-    parser.add_argument('--clang', help='directory where libclang resides in')
+    parser.add_argument('--clang', help='libclang\'s path')
     parser.add_argument('--template', help='location of the template file', default=None)
     args = parser.parse_args()
 
     if args.template is None:
         args.template = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'code_template')
 
-    if args.clang is None:
+    if not args.clang:
         import platform
 
         system = platform.system().lower()
         if system == 'darwin':
-            args.clang = '/Library/Developer/CommandLineTools/usr/lib'
+            args.clang = '/Library/Developer/CommandLineTools/usr/lib/libclang.dylib'
         elif os.path.exists('/usr/lib/libclang.so'):
-            args.clang = '/usr/lib/'
+            args.clang = '/usr/lib/libclang.so'
         elif os.path.exists('/usr/local/lib/libclang.so'):
-            args.clang = '/usr/local/lib'
+            args.clang = '/usr/local/lib/libclang.so'
 
     if args.clang is not None:
-        clang.cindex.Config.set_library_path(args.clang)
+        clang.cindex.Config.set_library_file(args.clang)
 
     index = clang.cindex.Index.create()
 
@@ -310,7 +310,7 @@ def main():
         template = f.read()
         with open(args.output, 'w') as out:
             def _filter(c):
-                return c.location.file.name == args.input
+                return c.location and c.location.file and c.location.file.name and c.location.file.name == args.input
 
             for class_info in extract_class_information(cursor, _filter):
                 out.write(build_class(template, class_info))
