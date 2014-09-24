@@ -45,7 +45,7 @@ private:
     ElementType value;
 
     SAXEventHandler<ElementType> internal_handler;
-    utility::scoped_ptr<error::ErrorBase> the_error;
+    utility03B1B951445A::scoped_ptr<error::ErrorBase> the_error;
     std::stack<signed char> state;
     // A stack of StartArray() and StartObject() event
     // must be recorded, so we know when the current
@@ -54,7 +54,7 @@ private:
 
     bool emplace_when_time_is_right()
     {
-        if (state.size() == 1 && state.top() == internal::OBJECT) {
+        if (state.size() == 1 && state.top() == internal3068C9AF9F43::OBJECT) {
             if (!static_cast<Derived*>(this)->Emplace(key, AUTOJSONCXX_MOVE_IF_NOEXCEPT(value))) {
                 the_error.reset(new error::DuplicateKeyError(AUTOJSONCXX_MOVE(key)));
                 return false;
@@ -117,12 +117,12 @@ public:
         return check_depth("unsigned") && checked_event_forwarding(internal_handler.Uint(i));
     }
 
-    bool Int64(utility::int64_t i)
+    bool Int64(utility03B1B951445A::int64_t i)
     {
         return check_depth("int64_t") && checked_event_forwarding(internal_handler.Int64(i));
     }
 
-    bool Uint64(utility::uint64_t i)
+    bool Uint64(utility03B1B951445A::uint64_t i)
     {
         return check_depth("uint64_t") && checked_event_forwarding(internal_handler.Uint64(i));
     }
@@ -150,20 +150,20 @@ public:
     {
         if (!check_depth("array"))
             return false;
-        state.push(internal::ARRAY);
+        state.push(internal3068C9AF9F43::ARRAY);
         return checked_event_forwarding(internal_handler.StartArray());
     }
 
     bool EndArray(SizeType length)
     {
-        assert(state.top() == internal::ARRAY);
+        assert(state.top() == internal3068C9AF9F43::ARRAY);
         state.pop();
         return check_depth("array") && checked_event_forwarding(internal_handler.EndArray(length));
     }
 
     bool StartObject()
     {
-        state.push(internal::OBJECT);
+        state.push(internal3068C9AF9F43::OBJECT);
         if (state.size() > 1)
             return checked_event_forwarding(internal_handler.StartObject());
         return true;
@@ -171,7 +171,7 @@ public:
 
     bool EndObject(SizeType length)
     {
-        assert(state.top() == internal::OBJECT);
+        assert(state.top() == internal3068C9AF9F43::OBJECT);
         state.pop();
         if (!state.empty())
             return checked_event_forwarding(internal_handler.EndObject(length));

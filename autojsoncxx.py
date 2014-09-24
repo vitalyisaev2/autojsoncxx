@@ -205,7 +205,7 @@ class MainCodeGenerator:
                              .format(m.variable_name) for m in self.fields_info if m.required)
 
     def key_event_handling(self):
-        return '\n'.join('else if (utility::string_equal(str, length, {key}, {key_length}))\n\
+        return '\n'.join('else if (utility03B1B951445A::string_equal(str, length, {key}, {key_length}))\n\
                          {{ state={state}; {check} }}'
                              .format(key=hard_escape(m.json_key), key_length=len(m.json_key),
                                      state=i, check=m.generate_flag_statement("true"))

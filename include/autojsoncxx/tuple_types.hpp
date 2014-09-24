@@ -115,14 +115,14 @@ public:
         return finish_when_depth_is_right(internal_handler.Uint(i));
     }
 
-    bool Int64(utility::int64_t i)
+    bool Int64(utility03B1B951445A::int64_t i)
     {
         if (finished)
             return static_cast<base_type*>(this)->Int64(i);
         return finish_when_depth_is_right(internal_handler.Int64(i));
     }
 
-    bool Uint64(utility::uint64_t i)
+    bool Uint64(utility03B1B951445A::uint64_t i)
     {
         if (finished)
             return static_cast<base_type*>(this)->Uint64(i);
@@ -195,7 +195,7 @@ public:
             return static_cast<base_type*>(this)->ReapError(errs);
 
         if (internal_handler.HasError()) {
-            utility::scoped_ptr<error::ErrorBase> guard(new error::ArrayElementError(index));
+            utility03B1B951445A::scoped_ptr<error::ErrorBase> guard(new error::ArrayElementError(index));
             errs.push(guard.release());
             internal_handler.ReapError(errs);
             return true;
@@ -239,12 +239,12 @@ public:
         return true;
     }
 
-    bool Int64(utility::int64_t)
+    bool Int64(utility03B1B951445A::int64_t)
     {
         return true;
     }
 
-    bool Uint64(utility::uint64_t)
+    bool Uint64(utility03B1B951445A::uint64_t)
     {
         return true;
     }

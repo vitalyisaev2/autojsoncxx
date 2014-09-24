@@ -244,7 +244,7 @@ struct Serializer<Writer, boost::shared_ptr<T> > {
     }
 };
 
-namespace utility {
+namespace utility03B1B951445A {
     namespace traits {
         template <class T>
         struct is_simple_type<boost::shared_ptr<T> > : public is_simple_type<T> {
@@ -313,13 +313,13 @@ public:
         return checked_event_forwarding(internal_handler->Uint(i));
     }
 
-    bool Int64(utility::int64_t i)
+    bool Int64(utility03B1B951445A::int64_t i)
     {
         initialize();
         return checked_event_forwarding(internal_handler->Int64(i));
     }
 
-    bool Uint64(utility::uint64_t i)
+    bool Uint64(utility03B1B951445A::uint64_t i)
     {
         initialize();
         return checked_event_forwarding(internal_handler->Uint64(i));

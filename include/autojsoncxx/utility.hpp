@@ -54,7 +54,7 @@
 #endif
 
 namespace autojsoncxx {
-namespace utility {
+namespace utility03B1B951445A {
 
     typedef unsigned int SizeType;
     typedef long long int64_t;
@@ -92,11 +92,11 @@ namespace utility {
         };
 
         template <>
-        struct is_simple_type<utility::int64_t> : public true_type {
+        struct is_simple_type<utility03B1B951445A::int64_t> : public true_type {
         };
 
         template <>
-        struct is_simple_type<utility::uint64_t> : public true_type {
+        struct is_simple_type<utility03B1B951445A::uint64_t> : public true_type {
         };
 
         template <>
@@ -334,7 +334,7 @@ namespace utility {
     }
 }
 
-namespace internal {
+namespace internal3068C9AF9F43 {
     const signed char ARRAY = 0;
     const signed char OBJECT = -1;
 }

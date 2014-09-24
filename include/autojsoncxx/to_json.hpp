@@ -50,7 +50,7 @@ inline void to_json(OutputStream& os, const ValueType& v)
 
 template <class ValueType>
 inline void to_json_string(std::string& str, const ValueType& v,
-                           std::size_t BufferSize = utility::default_buffer_size)
+                           std::size_t BufferSize = utility03B1B951445A::default_buffer_size)
 {
     typedef rapidjson::StringBuffer OutputStreamType;
     OutputStreamType os(0, BufferSize);
@@ -61,7 +61,7 @@ inline void to_json_string(std::string& str, const ValueType& v,
 template <class ValueType>
 inline void to_json_file(std::FILE* fp, const ValueType& v)
 {
-    char buffer[utility::default_buffer_size];
+    char buffer[utility03B1B951445A::default_buffer_size];
     rapidjson::FileWriteStream os(fp, buffer, sizeof(buffer));
     to_json(os, v);
 }
@@ -69,7 +69,7 @@ inline void to_json_file(std::FILE* fp, const ValueType& v)
 template <class ValueType>
 inline void to_json_file(const char* file_name, const ValueType& v)
 {
-    typedef utility::scoped_ptr<std::FILE, utility::file_closer> guard_type;
+    typedef utility03B1B951445A::scoped_ptr<std::FILE, utility03B1B951445A::file_closer> guard_type;
 
     guard_type file_guard(std::fopen(file_name, "w"));
 
@@ -94,7 +94,7 @@ inline void to_pretty_json(OutputStream& os, const ValueType& v)
 
 template <class ValueType>
 inline void to_pretty_json_string(std::string& str, const ValueType& v,
-                                  std::size_t BufferSize = utility::default_buffer_size)
+                                  std::size_t BufferSize = utility03B1B951445A::default_buffer_size)
 {
     typedef rapidjson::StringBuffer OutputStreamType;
     OutputStreamType os(0, BufferSize);
@@ -105,7 +105,7 @@ inline void to_pretty_json_string(std::string& str, const ValueType& v,
 template <class ValueType>
 inline void to_pretty_json_file(std::FILE* fp, const ValueType& v)
 {
-    char buffer[utility::default_buffer_size];
+    char buffer[utility03B1B951445A::default_buffer_size];
     rapidjson::FileWriteStream os(fp, buffer, sizeof(buffer));
     to_pretty_json(os, v);
 }
@@ -113,7 +113,7 @@ inline void to_pretty_json_file(std::FILE* fp, const ValueType& v)
 template <class ValueType>
 inline void to_pretty_json_file(const char* file_name, const ValueType& v)
 {
-    typedef utility::scoped_ptr<std::FILE, utility::file_closer> guard_type;
+    typedef utility03B1B951445A::scoped_ptr<std::FILE, utility03B1B951445A::file_closer> guard_type;
 
     guard_type file_guard(std::fopen(file_name, "w"));
 

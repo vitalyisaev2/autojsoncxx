@@ -42,7 +42,7 @@ class VectorBaseSAXEventHandler {
 private:
     ElementType current;
     SAXEventHandler<ElementType> internal_handler;
-    utility::scoped_ptr<error::ErrorBase> the_error;
+    utility03B1B951445A::scoped_ptr<error::ErrorBase> the_error;
     std::stack<signed char> state;
     // A stack of StartArray() and StartObject() event
     // must be recorded, so we know when the current
@@ -51,7 +51,7 @@ private:
 
     void push_when_time_is_right()
     {
-        if (state.size() == 1 && state.top() == internal::ARRAY) {
+        if (state.size() == 1 && state.top() == internal3068C9AF9F43::ARRAY) {
             static_cast<Derived*>(this)->Push(AUTOJSONCXX_MOVE_IF_NOEXCEPT(current));
             current = ElementType();
             internal_handler.PrepareForReuse();
@@ -60,7 +60,7 @@ private:
 
     bool check_array_length(SizeType length)
     {
-        if (state.size() == 1 && state.top() == internal::ARRAY
+        if (state.size() == 1 && state.top() == internal3068C9AF9F43::ARRAY
             && !static_cast<Derived*>(this)->CheckLength(length)) {
             this->the_error.reset(new error::ArrayLengthMismatchError(static_cast<Derived*>(this)->ExpectedLength(), length));
             return false;
@@ -120,12 +120,12 @@ public:
         return check_depth("unsigned") && checked_event_forwarding(internal_handler.Uint(i));
     }
 
-    bool Int64(utility::int64_t i)
+    bool Int64(utility03B1B951445A::int64_t i)
     {
         return check_depth("int64_t") && checked_event_forwarding(internal_handler.Int64(i));
     }
 
-    bool Uint64(utility::uint64_t i)
+    bool Uint64(utility03B1B951445A::uint64_t i)
     {
         return check_depth("uint64_t") && checked_event_forwarding(internal_handler.Uint64(i));
     }
@@ -147,7 +147,7 @@ public:
 
     bool StartArray()
     {
-        state.push(internal::ARRAY);
+        state.push(internal3068C9AF9F43::ARRAY);
         if (state.size() > 1 && !internal_handler.StartArray()) {
             set_element_error();
             return false;
@@ -157,7 +157,7 @@ public:
 
     bool EndArray(SizeType length)
     {
-        assert(state.top() == internal::ARRAY);
+        assert(state.top() == internal3068C9AF9F43::ARRAY);
 
         // When depth > 1, this event should be forwarded to the element
         if (state.size() > 1 && !internal_handler.EndArray(length)) {
@@ -180,13 +180,13 @@ public:
     {
         if (!check_depth("object"))
             return false;
-        state.push(internal::OBJECT);
+        state.push(internal3068C9AF9F43::OBJECT);
         return checked_event_forwarding(internal_handler.StartObject());
     }
 
     bool EndObject(SizeType length)
     {
-        assert(state.top() == internal::OBJECT);
+        assert(state.top() == internal3068C9AF9F43::OBJECT);
         state.pop();
         return check_depth("object") && checked_event_forwarding(internal_handler.EndObject(length));
     }

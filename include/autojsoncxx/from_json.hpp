@@ -41,7 +41,7 @@ inline bool from_json(Reader& r, InputStream& is, ValueType& value, ParsingResul
 
     // If the ValueType is extremely complicated, the handler may also be extremely complicated
     // so it is safer to allocate it on the heap
-    utility::scoped_ptr<handler_type> handler(new handler_type(&value));
+    utility03B1B951445A::scoped_ptr<handler_type> handler(new handler_type(&value));
 
     result.set_result(r.Parse(is, *handler));
     handler->ReapError(result.error_stack());
@@ -71,7 +71,7 @@ inline bool from_json_string(const std::string& json, ValueType& value, ParsingR
 template <class ValueType>
 inline bool from_json_file(std::FILE* file, ValueType& value, ParsingResult& result)
 {
-    char buffer[utility::default_buffer_size];
+    char buffer[utility03B1B951445A::default_buffer_size];
     rapidjson::FileReadStream fs(file, buffer, sizeof(buffer));
     return from_json(fs, value, result);
 }
@@ -79,7 +79,7 @@ inline bool from_json_file(std::FILE* file, ValueType& value, ParsingResult& res
 template <class ValueType>
 inline bool from_json_file(const char* file_name, ValueType& value, ParsingResult& result)
 {
-    typedef utility::scoped_ptr<std::FILE, utility::file_closer> guard_type;
+    typedef utility03B1B951445A::scoped_ptr<std::FILE, utility03B1B951445A::file_closer> guard_type;
 
     guard_type file_guard(std::fopen(file_name, "r"));
 
