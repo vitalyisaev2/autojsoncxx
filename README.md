@@ -13,7 +13,8 @@ More importantly, maually writing the code means duplication of effort, and dupl
 ### Dependency 
 
 * [RapidJSON](https://github.com/miloyip/rapidjson) 
-* (optional) [Parsimonious](https://github.com/erikrose/parsimonious)
+* [Python 2.7] (http://www.python.org)
+* [libclang 3.5] (http://clang.llvm.org) and its python binding 
 * (optional) [Catch](https://github.com/philsquared/Catch)
 * (optional) [Boost](http://www.boost.org)
 
@@ -63,30 +64,28 @@ If too many tests fail, make sure your work directory points to the `test` direc
 * MSVC 11/12 (x86/x64) on Windows 7
 
 ## First example
+First of all, you need to make sure that `libclang` and its Python bindings is installed.
 
-The code generator reads a JSON file that defines the class structure. An example definition is like this (remember to fully qualify the type name with its namespace)
+First let's define a simple struct
+```c++
+#include <string>
+#include <vector>
 
-```javascript
+struct Person
 {
-    "name": "Person",
-    "members":
-    [
-        ["unsigned long long", "ID", {"required": true}],
-        ["std::string", "name", {"default": "anonymous"}],
-        ["double", "height"],
-        ["double", "weight"],
-        ["std::vector<unsigned long long>", "known_associates"]
-    ]
-}
+    std::string name;
+    unsigned long long ID;
+    double weight, height;
+    std::vector<unsigned long long> known_associates;
+};
 ```
 
-Run the script *autojsoncxx.py* (requires Python 3) on this definition file, and a header file will be generated. It includes a definition for `Person` as well as some helper classes. The `Person` is a `struct` with all members public, meant as a data holder without any additional functionalities. It can be used with free functions, or [wrapped up in another class to provide encapsulation and polymorphism](https://en.wikipedia.org/wiki/Composition_over_inheritance).
-
-```bash
-python3 autojsoncxx.py --input=persondef.json --output=person.hpp
+To generate the code,
+```
+python autojsoncxx.py --input=person.hpp --output=person_helper.hpp
 ```
 
-Remember to add the include directory of *autojsoncxx* and *rapidjson* to your project header search path (no linking is required). 
+If an error tells you that clang cannot be found, use the option `--clang` to set the directory where `libclang` resides in.
 
 The below examples uses c++11 features, but the library should also work with c++03 compilers.
 
@@ -96,6 +95,7 @@ The below examples uses c++11 features, but the library should also work with c+
 #define AUTOJSONCXX_MODERN_COMPILER 1 // Turn on all the c++11 features of the library
 #include <iostream>
 #include "person.hpp"
+#include "person_helper.hpp"
 
 int main()
 {
@@ -135,6 +135,7 @@ Now let's try read that back
 #define AUTOJSONCXX_MODERN_COMPILER 1
 #include <iostream>
 #include "person.hpp"
+#include "person_helper.hpp"
 
 int main()
 {
@@ -270,6 +271,7 @@ The supported types can be arbitrarily nested, for example
 #define AUTOJSONCXX_MODERN_COMPILER 1 
 #include <iostream>
 #include "person.hpp"
+#include "person_helper.hpp"
 
 int main()
 {
