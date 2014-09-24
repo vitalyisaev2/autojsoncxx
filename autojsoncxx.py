@@ -44,7 +44,7 @@ class AnnotationError(Exception):
         self.node = node
 
     def __str__(self):
-        return "The annotation syntax is incorrect: " + repr(node)
+        return "The annotation syntax is incorrect: " + repr(self.node)
 
 
 def get_full_class_name(class_declaration):
@@ -146,36 +146,33 @@ class FieldInfo:
             return ''
 
 
-def extract_field_information(cursor, filter):
-    for cc in cursor.get_children():
-        if not filter(cc):
-            continue
-
-        if cc.kind == clang.cindex.CursorKind.FIELD_DECL:
+def extract_field_information(cursor):
+    for c in cursor.get_children():
+        if c.kind == clang.cindex.CursorKind.FIELD_DECL:
             info = FieldInfo()
-            info.type_name = get_full_type_name(cc.type)
-            info.variable_name = cc.displayname
+            info.type_name = get_full_type_name(c.type)
+            info.variable_name = c.displayname
             info.json_key = info.variable_name
 
-            for ccc in cc.get_children():
-                if ccc.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
-                    info.parse_annotation(ccc.displayname)
+            for cc in c.get_children():
+                if cc.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
+                    info.parse_annotation(cc.displayname)
 
             yield info
 
 
-def extract_class_information(cursor, filter):
+def extract_class_information(cursor, _filter):
     for c in cursor.get_children():
-        if not filter(c):
+        if not _filter(c):
             continue
 
         if c.kind == clang.cindex.CursorKind.NAMESPACE:
-            for cc in extract_class_information(c, filter):
+            for cc in extract_class_information(c, _filter):
                 yield cc
         elif c.kind == clang.cindex.CursorKind.CLASS_DECL or c.kind == clang.cindex.CursorKind.STRUCT_DECL:
             info = ClassInfo()
             info.name = get_full_class_name(c)
-            info.fields = list(extract_field_information(c, filter))
+            info.fields = list(extract_field_information(c))
 
             for cc in c.get_children():
                 if cc.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
@@ -186,8 +183,8 @@ def extract_class_information(cursor, filter):
 
 class MainCodeGenerator:
     def __init__(self, class_info):
-        self.fields_info = [f for f in class_info.fields if not f.ignore]
         self.class_info = class_info
+        self.fields_info = [f for f in class_info.fields if not f.ignore]
 
     def handler_declarations(self):
         return '\n'.join('SAXEventHandler< {} > handler_{};'.format(m.type_name, i)
@@ -227,7 +224,7 @@ class MainCodeGenerator:
 
     def data_serialization(self):
         return '\n'.join('w.Key({}); Serializer< {}, {} >()(w, value.{});'
-                             .format(hard_escape(m.json_key.encode('utf-8')), self.writer_type_name(),
+                             .format(hard_escape(m.json_key), self.writer_type_name(),
                                      m.type_name, m.variable_name)
                          for m in self.fields_info)
 
@@ -276,9 +273,10 @@ def main():
                                                  '(visit https://github.com/netheril96/autojsoncxx for details)')
 
     parser.add_argument('-i', '--input', help='input file for the header or source of class definitions', required=True)
-    parser.add_argument('-o', '--output', help='output file name for the generated header file', default=None)
-    parser.add_argument('-a', '--args', help='arguments passed to clang (e.g. "-I../include --std=c++11")')
-    parser.add_argument('-c', '--clang', help='directory where libclang resides in')
+    parser.add_argument('-o', '--output', help='output file name for the generated header file', required=True)
+    parser.add_argument('--args', action='append',
+                        help='arguments passed to clang (e.g. "--args=-I../include --args=--std=c++11")')
+    parser.add_argument('--clang', help='directory where libclang resides in')
     parser.add_argument('--template', help='location of the template file', default=None)
     args = parser.parse_args()
 
@@ -300,16 +298,16 @@ def main():
         clang.cindex.Config.set_library_path(args.clang)
 
     index = clang.cindex.Index.create()
-    translation_unit = index.parse(args.input, ['-x', 'c++', '-DAUTOJSONCXX_CODE_GENERATOR'])
+    translation_unit = index.parse(args.input, ['-x', 'c++'] + args.args)
     cursor = translation_unit.cursor
 
     with open(args.template) as f:
         template = f.read()
         with open(args.output, 'w') as out:
-            def filter(c):
+            def _filter(c):
                 return c.location.file.name == args.input
 
-            for class_info in extract_class_information(cursor, filter):
+            for class_info in extract_class_information(cursor, _filter):
                 out.write(build_class(template, class_info))
                 out.write('\n')
 
