@@ -9,7 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
+// The above copyright notice and this permission notice shall be included in
+// all
 // copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
@@ -140,15 +141,14 @@ public:
         return true;
     }
 
-    void PrepareForReuse()
-    {
-    }
+    void PrepareForReuse() {}
 };
 
 #if AUTOJSONCXX_HAS_MODERN_TYPES
 
 template <>
-class SAXEventHandler<std::nullptr_t> : public BaseSAXEventHandler<SAXEventHandler<std::nullptr_t> > {
+class SAXEventHandler<std::nullptr_t>
+    : public BaseSAXEventHandler<SAXEventHandler<std::nullptr_t> > {
 private:
 public:
     static const char* type_name()
@@ -156,9 +156,7 @@ public:
         return "null";
     }
 
-    explicit SAXEventHandler(std::nullptr_t*)
-    {
-    }
+    explicit SAXEventHandler(std::nullptr_t*) {}
 
     bool Null()
     {
@@ -169,7 +167,8 @@ public:
 #endif
 
 template <>
-class SAXEventHandler<bool> : public BaseSAXEventHandler<SAXEventHandler<bool> > {
+class SAXEventHandler<bool>
+    : public BaseSAXEventHandler<SAXEventHandler<bool> > {
 private:
     bool* m_value;
 
@@ -191,9 +190,11 @@ public:
     }
 };
 
-// This is mostly an alias for `bool` type so that the ugly `std::vector<bool>` can be avoided
+// This is mostly an alias for `bool` type so that the ugly `std::vector<bool>`
+// can be avoided
 template <>
-class SAXEventHandler<char> : public BaseSAXEventHandler<SAXEventHandler<char> > {
+class SAXEventHandler<char>
+    : public BaseSAXEventHandler<SAXEventHandler<char> > {
 private:
     char* m_value;
 
@@ -242,8 +243,8 @@ public:
 
     bool Int64(utility03B1B951445A::int64_t i)
     {
-        if (i > static_cast<utility03B1B951445A::int64_t>(std::numeric_limits<int>::max())
-            || i < static_cast<utility03B1B951445A::int64_t>(std::numeric_limits<int>::min()))
+        if (i > static_cast<utility03B1B951445A::int64_t>(
+                    std::numeric_limits<int>::max()) || i < static_cast<utility03B1B951445A::int64_t>(std::numeric_limits<int>::min()))
             return set_out_of_range("int64_t");
         *m_value = static_cast<int>(i);
         return true;
@@ -251,7 +252,8 @@ public:
 
     bool Uint64(utility03B1B951445A::uint64_t i)
     {
-        if (i > static_cast<utility03B1B951445A::uint64_t>(std::numeric_limits<int>::max()))
+        if (i > static_cast<utility03B1B951445A::uint64_t>(
+                    std::numeric_limits<int>::max()))
             return set_out_of_range("uint64_t");
         *m_value = static_cast<int>(i);
         return true;
@@ -264,7 +266,8 @@ public:
 };
 
 template <>
-class SAXEventHandler<unsigned> : public BaseSAXEventHandler<SAXEventHandler<unsigned> > {
+class SAXEventHandler<unsigned>
+    : public BaseSAXEventHandler<SAXEventHandler<unsigned> > {
 private:
     unsigned* m_value;
 
@@ -291,7 +294,8 @@ public:
 
     bool Int64(utility03B1B951445A::int64_t i)
     {
-        if (i < 0 || i > static_cast<utility03B1B951445A::int64_t>(std::numeric_limits<unsigned>::max()))
+        if (i < 0 || i > static_cast<utility03B1B951445A::int64_t>(
+                             std::numeric_limits<unsigned>::max()))
             return set_out_of_range("int64_t");
         *m_value = static_cast<unsigned>(i);
         return true;
@@ -299,7 +303,8 @@ public:
 
     bool Uint64(utility03B1B951445A::uint64_t i)
     {
-        if (i > static_cast<utility03B1B951445A::uint64_t>(std::numeric_limits<unsigned>::max()))
+        if (i > static_cast<utility03B1B951445A::uint64_t>(
+                    std::numeric_limits<unsigned>::max()))
             return set_out_of_range("uint64_t");
         *m_value = static_cast<unsigned>(i);
         return true;
@@ -312,7 +317,107 @@ public:
 };
 
 template <>
-class SAXEventHandler<utility03B1B951445A::int64_t> : public BaseSAXEventHandler<SAXEventHandler<utility03B1B951445A::int64_t> > {
+class SAXEventHandler<long>
+    : public BaseSAXEventHandler<SAXEventHandler<long> > {
+private:
+    long* m_value;
+
+public:
+    explicit SAXEventHandler(long* v)
+        : m_value(v)
+    {
+    }
+
+    bool Int(int i)
+    {
+        *m_value = i;
+        return true;
+    }
+
+    bool Uint(unsigned i)
+    {
+        *m_value = static_cast<long>(i);
+        return true;
+    }
+
+    bool Int64(utility03B1B951445A::int64_t i)
+    {
+        if (i > static_cast<utility03B1B951445A::int64_t>(
+                    std::numeric_limits<long>::max()) || i < static_cast<utility03B1B951445A::int64_t>(std::numeric_limits<long>::min()))
+            return set_out_of_range("int64_t");
+        *m_value = static_cast<long>(i);
+        return true;
+    }
+
+    bool Uint64(utility03B1B951445A::uint64_t i)
+    {
+        if (i > static_cast<utility03B1B951445A::uint64_t>(
+                    std::numeric_limits<long>::max()))
+            return set_out_of_range("uint64_t");
+        *m_value = static_cast<long>(i);
+        return true;
+    }
+
+    static const char* type_name()
+    {
+        return "int";
+    }
+};
+
+template <>
+class SAXEventHandler<unsigned long>
+    : public BaseSAXEventHandler<SAXEventHandler<unsigned long> > {
+private:
+    unsigned long* m_value;
+
+public:
+    explicit SAXEventHandler(unsigned long* v)
+        : m_value(v)
+    {
+    }
+
+    bool Int(int i)
+    {
+        if (i < 0)
+            return set_out_of_range("int");
+
+        *m_value = static_cast<unsigned long>(i);
+        return true;
+    }
+
+    bool Uint(unsigned i)
+    {
+        *m_value = i;
+        return true;
+    }
+
+    bool Int64(utility03B1B951445A::int64_t i)
+    {
+        if (i < 0 || i > static_cast<utility03B1B951445A::int64_t>(
+                             std::numeric_limits<unsigned long>::max()))
+            return set_out_of_range("int64_t");
+        *m_value = static_cast<unsigned long>(i);
+        return true;
+    }
+
+    bool Uint64(utility03B1B951445A::uint64_t i)
+    {
+        if (i > static_cast<utility03B1B951445A::uint64_t>(
+                    std::numeric_limits<unsigned long>::max()))
+            return set_out_of_range("uint64_t");
+        *m_value = static_cast<unsigned long>(i);
+        return true;
+    }
+
+    static const char* type_name()
+    {
+        return "unsigned";
+    }
+};
+
+template <>
+class SAXEventHandler<utility03B1B951445A::int64_t>
+    : public BaseSAXEventHandler<SAXEventHandler<utility03B1B951445A::int64_t> > {
 private:
     utility03B1B951445A::int64_t* m_value;
 
@@ -342,7 +447,8 @@ public:
 
     bool Uint64(utility03B1B951445A::uint64_t i)
     {
-        if (i > static_cast<utility03B1B951445A::uint64_t>(std::numeric_limits<utility03B1B951445A::int64_t>::max()))
+        if (i > static_cast<utility03B1B951445A::uint64_t>(
+                    std::numeric_limits<utility03B1B951445A::int64_t>::max()))
             return set_out_of_range("uint64_t");
         *m_value = static_cast<utility03B1B951445A::int64_t>(i);
         return true;
@@ -355,7 +461,8 @@ public:
 };
 
 template <>
-class SAXEventHandler<utility03B1B951445A::uint64_t> : public BaseSAXEventHandler<SAXEventHandler<utility03B1B951445A::uint64_t> > {
+class SAXEventHandler<utility03B1B951445A::uint64_t>
+    : public BaseSAXEventHandler<SAXEventHandler<utility03B1B951445A::uint64_t> > {
 private:
     utility03B1B951445A::uint64_t* m_value;
 
@@ -400,7 +507,8 @@ public:
 };
 
 template <>
-class SAXEventHandler<double> : public BaseSAXEventHandler<SAXEventHandler<double> > {
+class SAXEventHandler<double>
+    : public BaseSAXEventHandler<SAXEventHandler<double> > {
 private:
     double* m_value;
 
@@ -427,7 +535,8 @@ public:
         const utility03B1B951445A::int64_t threshold = 1LL << 53;
         if (i > threshold || i < -threshold)
             return this->set_out_of_range("int64_t");
-        // the maximum value of double is much larger, but we want to prevent precision loss
+        // the maximum value of double is much larger, but we want to prevent
+        // precision loss
 
         *m_value = static_cast<double>(i);
         return true;
@@ -456,7 +565,8 @@ public:
 };
 
 template <>
-class SAXEventHandler<std::string> : public BaseSAXEventHandler<SAXEventHandler<std::string> > {
+class SAXEventHandler<std::string>
+    : public BaseSAXEventHandler<SAXEventHandler<std::string> > {
 private:
     std::string* m_value;
 

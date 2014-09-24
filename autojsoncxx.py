@@ -298,7 +298,12 @@ def main():
         clang.cindex.Config.set_library_path(args.clang)
 
     index = clang.cindex.Index.create()
-    translation_unit = index.parse(args.input, ['-x', 'c++'] + args.args)
+
+    arguments = ['-x', 'c++']
+    if args.args:
+        arguments.extend(args.args)
+
+    translation_unit = index.parse(args.input, arguments)
     cursor = translation_unit.cursor
 
     with open(args.template) as f:
