@@ -1,10 +1,10 @@
 INCLUDE ?= -I../include -I../rapidjson/include -I../catch/single_include
 TARGET ?= autojsoncxx_catch
 
-PYTHON3 ?= python3
+PYTHON ?= python
 GENERATOR_SCRIPT = ../autojsoncxx.py
-DEFINITION_FILE ?= ../examples/userdef.json
-GENERATED_HPP ?= userdef.hpp
+DEFINITION_FILE ?= userdef.hpp
+GENERATED_HPP ?= userdef_helper.hpp
 CODE_TEMPLATE = ../code_template
 
 all: $(TARGET)
@@ -13,7 +13,7 @@ $(TARGET): main.o test.o $(GENERATED_HPP)
 	$(CXX) $(CXXFLAGS) main.o test.o -o $(TARGET)
 	
 $(GENERATED_HPP): $(DEFINITION_FILE) $(GENERATOR_SCRIPT) $(CODE_TEMPLATE)
-	$(PYTHON3) $(GENERATOR_SCRIPT) --check --output=$(GENERATED_HPP) --input=$(DEFINITION_FILE)
+	$(PYTHON) $(GENERATOR_SCRIPT) --args=-DCODEGEN --args=-std=c++11  --output=$(GENERATED_HPP) --input=$(DEFINITION_FILE) 
 
 main.o: main.cpp 
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c main.cpp -o main.o

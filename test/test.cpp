@@ -33,6 +33,7 @@
 #endif
 
 #include "userdef.hpp"
+#include "userdef_helper.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -40,16 +41,6 @@
 using namespace autojsoncxx;
 using namespace config;
 using namespace config::event;
-
-inline bool operator==(Date d1, Date d2)
-{
-    return d1.year == d2.year && d1.month == d2.month && d1.day == d2.day;
-}
-
-inline bool operator!=(Date d1, Date d2)
-{
-    return !(d1 == d2);
-}
 
 inline std::string read_all(const char* file_name)
 {
@@ -289,7 +280,7 @@ TEST_CASE("Test for mismatch between JSON and C++ class std::vector<config::User
 
 TEST_CASE("Test for mismatch between JSON and C++ class std::map<std::string, config::User>", "[parsing], [error]")
 {
-    std::map<std::string, config::User> users;
+    std::map<std::string, User> users;
     ParsingResult err;
 
     SECTION("Mismatch between object and array", "[parsing], [error], [type mismatch]")
