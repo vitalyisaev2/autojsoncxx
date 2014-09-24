@@ -591,14 +591,6 @@ public:
 template <class Writer, class T>
 struct Serializer;
 
-template <class Writer>
-struct Serializer<Writer, int> {
-    void operator()(Writer& w, int i) const
-    {
-        w.Int(i);
-    }
-};
-
 #if AUTOJSONCXX_HAS_MODERN_TYPES
 
 template <class Writer>
@@ -628,10 +620,34 @@ struct Serializer<Writer, char> {
 };
 
 template <class Writer>
+struct Serializer<Writer, int> {
+    void operator()(Writer& w, int i) const
+    {
+        w.Int(i);
+    }
+};
+
+template <class Writer>
 struct Serializer<Writer, unsigned> {
     void operator()(Writer& w, unsigned i) const
     {
         w.Uint(i);
+    }
+};
+
+template <class Writer>
+struct Serializer<Writer, long> {
+    void operator()(Writer& w, long i) const
+    {
+        w.Int64(i);
+    }
+};
+
+template <class Writer>
+struct Serializer<Writer, unsigned long> {
+    void operator()(Writer& w, unsigned long i) const
+    {
+        w.Uint64(i);
     }
 };
 
