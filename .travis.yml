@@ -1,5 +1,5 @@
 language: cpp
 before_install: "sudo apt-get update"
-install: "sudo apt-get install -y python-pip libclang-dev && sudo pip install clang"
+install: "sudo apt-get install -y python-pip  && sudo pip install clang && sudo ./install_clang.sh"
 script: "make && make test"
 compiler: clang
