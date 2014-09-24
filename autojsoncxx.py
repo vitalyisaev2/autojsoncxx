@@ -30,13 +30,21 @@ import re
 import argparse
 import os
 import hashlib
-
+import xml.etree.ElementTree as ET
 import io
 
 open = io.open
 
 import clang
 import clang.cindex
+
+
+class AnnotationError(Exception):
+    def __init__(self, node):
+        self.node = node
+
+    def __str__(self):
+        return "The annotation syntax is incorrect: " + repr(node)
 
 
 def get_full_class_name(class_declaration):
@@ -79,26 +87,59 @@ def hard_escape(text):
     return '"' + ''.join(escape(char) for char in text) + '"'
 
 
-class ClassInfo:
-    accept_options = {"parse_mode"}
+def get_truth_value(element_node):
+    if element_node is None:
+        return False
+    if element_node.text.lower() == b'true':
+        return True
+    if element_node.text.lower() == b'false':
+        return False
 
+    raise AnnotationError(element_node)
+
+
+class ClassInfo:
     def __init__(self):
         self.name = ''
         self.strict_parsing = False
         self.fields = []
 
+    def parse_annotation(self, annotation):
+        if not annotation:
+            return
+
+        node = ET.fromstring(annotation)
+        if node.tag != 'codegen':
+            raise AnnotationError(node)
+        self.strict_parsing = get_truth_value(node.find('strict_parsing'))
+
 
 class FieldInfo:
-    accept_options = {'default', 'required', 'json_key', 'comment'}
-
     def __init__(self):
         self.type_name = ''
         self.variable_name = ''
         self.required = False
-        self.ignored = ''
+        self.ignore = ''
         self.json_key = ''
 
-    def set_flag_statement(self, flag):
+    def parse_annotation(self, annotation):
+        if not annotation:
+            return
+
+        node = ET.fromstring(annotation)
+        if node.tag != 'codegen':
+            raise AnnotationError(node)
+
+        require_node = node.find('required')
+        self.required = get_truth_value(require_node)
+
+        ignore_node = node.find('ignore')
+        self.ignore = get_truth_value(ignore_node)
+
+        json_key_node = node.find('key')
+        self.json_key = json_key_node.text if json_key_node is not None else self.variable_name
+
+    def generate_flag_statement(self, flag):
         if self.required:
             return 'has_{} = {};'.format(self.variable_name, flag)
         else:
@@ -109,11 +150,17 @@ def extract_field_information(cursor, filter):
     for cc in cursor.get_children():
         if not filter(cc):
             continue
+
         if cc.kind == clang.cindex.CursorKind.FIELD_DECL:
             info = FieldInfo()
             info.type_name = get_full_type_name(cc.type)
             info.variable_name = cc.displayname
             info.json_key = info.variable_name
+
+            for ccc in cc.get_children():
+                if ccc.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
+                    info.parse_annotation(ccc.displayname)
+
             yield info
 
 
@@ -121,6 +168,7 @@ def extract_class_information(cursor, filter):
     for c in cursor.get_children():
         if not filter(c):
             continue
+
         if c.kind == clang.cindex.CursorKind.NAMESPACE:
             for cc in extract_class_information(c, filter):
                 yield cc
@@ -128,12 +176,17 @@ def extract_class_information(cursor, filter):
             info = ClassInfo()
             info.name = get_full_class_name(c)
             info.fields = list(extract_field_information(c, filter))
+
+            for cc in c.get_children():
+                if cc.kind == clang.cindex.CursorKind.ANNOTATE_ATTR:
+                    info.parse_annotation(cc.displayname)
+
             yield info
 
 
 class MainCodeGenerator:
     def __init__(self, class_info):
-        self.fields_info = class_info.fields
+        self.fields_info = [f for f in class_info.fields if not f.ignore]
         self.class_info = class_info
 
     def handler_declarations(self):
@@ -145,10 +198,10 @@ class MainCodeGenerator:
                          for i, m in enumerate(self.fields_info))
 
     def flags_declaration(self):
-        return '\n'.join('bool has_{};'.format(m.variable_name()) for m in self.fields_info if m.required)
+        return '\n'.join('bool has_{};'.format(m.variable_name) for m in self.fields_info if m.required)
 
     def flags_reset(self):
-        return '\n'.join(m.set_flag_statement("false") for m in self.fields_info)
+        return '\n'.join(m.generate_flag_statement("false") for m in self.fields_info)
 
     def post_validation(self):
         return '\n'.join('if (!has_{0}) set_missing_required("{0}");'
@@ -158,7 +211,7 @@ class MainCodeGenerator:
         return '\n'.join('else if (utility::string_equal(str, length, {key}, {key_length}))\n\
                          {{ state={state}; {check} }}'
                              .format(key=hard_escape(m.json_key), key_length=len(m.json_key),
-                                     state=i, check=m.set_flag_statement("true"))
+                                     state=i, check=m.generate_flag_statement("true"))
                          for i, m in enumerate(self.fields_info))
 
     def event_forwarding(self, call_text):
@@ -255,6 +308,7 @@ def main():
         with open(args.output, 'w') as out:
             def filter(c):
                 return c.location.file.name == args.input
+
             for class_info in extract_class_information(cursor, filter):
                 out.write(build_class(template, class_info))
                 out.write('\n')
