@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Autojsoncxx : A header-only library and a code generator to automatically translate between JSON and C++ types">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Autojsoncxx</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/netheril96/autojsoncxx">View on GitHub</a>
+
+          <h1 id="project_title">Autojsoncxx</h1>
+          <h2 id="project_tagline">A header-only library and a code generator to automatically translate between JSON and C++ types</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/netheril96/autojsoncxx/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/netheril96/autojsoncxx/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="autojsoncxx" class="anchor" href="#autojsoncxx"><span class="octicon octicon-link"></span></a>autojsoncxx</h1>
+
+<p>A header-only library and a code generator to <strong>automagically</strong> translate between <strong>JSON</strong> and <strong>C++</strong> types.</p>
+
+<h2>
+<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h2>
+
+<p>JSON is an excellent format for data serialization due to its simplicity, flexibility, portability and human-readable nature. Writing code to parse and generate JSON, however, is not an easy task in a statically typed language. Even with the help of JSON libraries, you need to write a lot of boilerplate code, and convoluted ones if you need to enforce the static typing of C++.</p>
+
+<p>More importantly, maually writing the code means duplication of effort, and duplication is bad for programmers. When your client or PM request a change in feature, many classes (like the class responsible for configuration) will likely change, and you will have to rewrite the code. During the rewrite, time is wasted, people become impatient, and bugs may be introduced when the class definition, parsing and serialization code become out of sync.</p>
+
+<p><em>autojsoncxx</em> is an attempt to solve this problem by automating such process. It is currently still in beta stage, so expect things to change in the future.</p>
+
+<h3>
+<a name="dependency" class="anchor" href="#dependency"><span class="octicon octicon-link"></span></a>Dependency</h3>
+
+<ul>
+<li>
+<a href="https://github.com/miloyip/rapidjson">RapidJSON</a> </li>
+<li>(optional) <a href="https://github.com/erikrose/parsimonious">Parsimonious</a>
+</li>
+<li>(optional) <a href="https://github.com/philsquared/Catch">Catch</a>
+</li>
+<li>(optional) <a href="http://www.boost.org">Boost</a>
+</li>
+</ul><h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>The parsing/serializing code are <strong>automagically</strong> generated. You don't even need to understand what is proper JSON to use it, although it may help you diagnose problems.</li>
+<li>
+<strong>Detailed error message</strong>. Not only do you get informed if the JSON is not valid, but you will have a verbose trace back pointing to the location of the problem as well, if the JSON value does not fit your class structure.</li>
+<li>
+<strong>Ease of use</strong>. Many convience functions are added so that a single function call is enough for most use cases. The library as well as its dependency are header only, while the code generator depends only on standard library of Python 3, so no complicated setup for your build system is needed.</li>
+<li>
+<strong>Fast</strong>. The underlying JSON engine (RapidJSON) has been benchmarked to be about an order of magnitude faster than other popular JSON libraries. Besides, this library uses its SAX API, obviating the need of constructing a Document Object Model as the intermediate representation. Lastly, the library utilizes C++ templates to generate the algorithm at compile time, so no overhead of runtime indirection (except when error occurs).</li>
+<li>
+<strong>Flexible framework</strong>. You can add more type support to the library by specializing certain template classes. In addition, whenever a class is generated, you can also parse/serialize an array of such class, a nullable wrapper of such class, another class that contains it, etc.</li>
+<li>
+<strong>Liberal licence</strong>. Both the library and its dependency are licenced liberally (MIT or BSD-like). Anyone is free to copy, distribute, modify or include in their own projects, be it open source or commercial.</li>
+</ul><h2>
+<a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h2>
+
+<p><a href="https://travis-ci.org/netheril96/autojsoncxx"><img src="https://travis-ci.org/netheril96/autojsoncxx.svg?branch=master" alt="Build Status"></a></p>
+
+<p>To build the test, you need a sufficiently new compiler because the goal is to test all the type support, including many ones only introduced in c++11.</p>
+
+<p>First clone the repository, and pull the dependency</p>
+
+<div class="highlight highlight-bash"><pre>git clone https://github.com/netheril96/autojsoncxx.git
+git submodule init
+git submodule update
+</pre></div>
+
+<p><em>UNIX/Linux/Mac users</em>:</p>
+
+<div class="highlight highlight-bash"><pre>make
+make <span class="nb">test</span>
+</pre></div>
+
+<p><em>Windows users</em>: </p>
+
+<p>Generate the <code>test/userdef.hpp</code> file from the definition <code>examples/userdef.json</code>. Then open the solution file under <code>test/mscvXX_test/</code> to build and run the test.</p>
+
+<p>If too many tests fail, make sure your work directory points to the <code>test</code> directory.</p>
+
+<h3>
+<a name="currently-tested-compilers" class="anchor" href="#currently-tested-compilers"><span class="octicon octicon-link"></span></a>Currently tested compilers</h3>
+
+<ul>
+<li>Clang 3.4 on Mac OS X (11.9)</li>
+<li>GCC 4.9 (Homebrew) on Mac OS X (11.9)</li>
+<li>Clang 3.0 on Ubuntu 12.04 (x64)</li>
+<li>GCC 4.8 on Ubuntu 14.04.1 (x86/x64)</li>
+<li>MSVC 10 (x86) on Windows 7</li>
+<li>MSVC 11/12 (x86/x64) on Windows 7</li>
+</ul><h2>
+<a name="first-example" class="anchor" href="#first-example"><span class="octicon octicon-link"></span></a>First example</h2>
+
+<p>The code generator reads a JSON file that defines the class structure. An example definition is like this (remember to fully qualify the type name with its namespace)</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">{</span>
+    <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"Person"</span><span class="p">,</span>
+    <span class="s2">"members"</span><span class="o">:</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="s2">"unsigned long long"</span><span class="p">,</span> <span class="s2">"ID"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"required"</span><span class="o">:</span> <span class="kc">true</span><span class="p">}],</span>
+        <span class="p">[</span><span class="s2">"std::string"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="p">{</span><span class="s2">"default"</span><span class="o">:</span> <span class="s2">"anonymous"</span><span class="p">}],</span>
+        <span class="p">[</span><span class="s2">"double"</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">"double"</span><span class="p">,</span> <span class="s2">"weight"</span><span class="p">],</span>
+        <span class="p">[</span><span class="s2">"std::vector&lt;unsigned long long&gt;"</span><span class="p">,</span> <span class="s2">"known_associates"</span><span class="p">]</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Run the script <em>autojsoncxx.py</em> (requires Python 3) on this definition file, and a header file will be generated. It includes a definition for <code>Person</code> as well as some helper classes. The <code>Person</code> is a <code>struct</code> with all members public, meant as a data holder without any additional functionalities. It can be used with free functions, or <a href="https://en.wikipedia.org/wiki/Composition_over_inheritance">wrapped up in another class to provide encapsulation and polymorphism</a>.</p>
+
+<div class="highlight highlight-bash"><pre>python3 autojsoncxx.py --input<span class="o">=</span>persondef.json --output<span class="o">=</span>person.hpp
+</pre></div>
+
+<p>Remember to add the include directory of <em>autojsoncxx</em> and <em>rapidjson</em> to your project header search path (no linking is required). </p>
+
+<p>The below examples uses c++11 features, but the library should also work with c++03 compilers.</p>
+
+<p>(There is now also support for using <code>libclang</code> to <em>directly</em> parse C++ source, without JSON definition file at all. However, given that the API of <code>clang</code> changes so frequently without regards about backwards compatibility, it is not recommended for the faint of heart. See branch <code>clang</code> for details.)</p>
+
+<h3>
+<a name="serialization" class="anchor" href="#serialization"><span class="octicon octicon-link"></span></a>Serialization</h3>
+
+<div class="highlight highlight-c++"><pre><span class="cp">#define AUTOJSONCXX_MODERN_COMPILER 1 </span><span class="c1">// Turn on all the c++11 features of the library</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include "person.hpp"</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">Person</span> <span class="n">p</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">"Mike"</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">ID</span> <span class="o">=</span> <span class="mi">8940220481904ULL</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">weight</span> <span class="o">=</span> <span class="mi">70</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">height</span> <span class="o">=</span> <span class="mf">1.77</span><span class="p">;</span>
+    <span class="n">p</span><span class="p">.</span><span class="n">known_associates</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">149977889346362</span><span class="p">,</span> <span class="mi">90000134866608</span><span class="p">,</span> <span class="mi">44412567664</span> <span class="p">};</span>
+    <span class="c1">// Use successive push_back() if your compiler is not c++11 ready</span>
+
+    <span class="n">autojsoncxx</span><span class="o">::</span><span class="n">to_pretty_json_file</span><span class="p">(</span><span class="s">"person.json"</span><span class="p">,</span> <span class="n">p</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>This will generate a file <code>person.json</code> with contents below:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">{</span>
+    <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"Mike"</span><span class="p">,</span>
+    <span class="s2">"ID"</span><span class="o">:</span> <span class="mi">8940220481904</span><span class="p">,</span>
+    <span class="s2">"height"</span><span class="o">:</span> <span class="mf">1.77</span><span class="p">,</span>
+    <span class="s2">"weight"</span><span class="o">:</span> <span class="mf">70.0</span><span class="p">,</span>
+    <span class="s2">"known_associates"</span><span class="o">:</span> <span class="p">[</span>
+        <span class="mi">149977889346362</span><span class="p">,</span>
+        <span class="mi">90000134866608</span><span class="p">,</span>
+        <span class="mi">44412567664</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>
+<a name="parsing" class="anchor" href="#parsing"><span class="octicon octicon-link"></span></a>Parsing</h3>
+
+<p>Now let's try read that back</p>
+
+<div class="highlight highlight-c++"><pre><span class="cp">#define AUTOJSONCXX_MODERN_COMPILER 1</span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include "person.hpp"</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">autojsoncxx</span><span class="o">::</span><span class="n">ParsingResult</span> <span class="n">result</span><span class="p">;</span>
+    <span class="n">Person</span> <span class="n">p</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">autojsoncxx</span><span class="o">::</span><span class="n">from_json_file</span><span class="p">(</span><span class="s">"person.json"</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">result</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="n">result</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span><span class="p">;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"ID: "</span> <span class="o">&lt;&lt;</span> <span class="n">p</span><span class="p">.</span><span class="n">ID</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span>
+              <span class="o">&lt;&lt;</span> <span class="s">"name:  "</span> <span class="o">&lt;&lt;</span> <span class="n">p</span><span class="p">.</span><span class="n">name</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span>
+              <span class="o">&lt;&lt;</span> <span class="s">"height: "</span> <span class="o">&lt;&lt;</span> <span class="n">p</span><span class="p">.</span><span class="n">height</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span>
+              <span class="o">&lt;&lt;</span> <span class="s">"weight: "</span> <span class="o">&lt;&lt;</span> <span class="n">p</span><span class="p">.</span><span class="n">weight</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span><span class="p">;</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"known associates: "</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;&amp;</span> <span class="nl">id</span> <span class="p">:</span> <span class="n">p</span><span class="p">.</span><span class="n">known_associates</span><span class="p">)</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">id</span> <span class="o">&lt;&lt;</span> <span class="sc">'\t'</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<h3>
+<a name="error-handling" class="anchor" href="#error-handling"><span class="octicon octicon-link"></span></a>Error handling</h3>
+
+<p>If the JSON file is malformed, any decent JSON library will detect it and tell you what goes wrong. But what if the JSON value is perfectly valid, but not layed out the way you expected? Usually you have to manually check the DOM tree against your specification, but this library will automatically generates the necessary code.</p>
+
+<p>Here is valid JSON file</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">{</span>
+    <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"Mike"</span><span class="p">,</span>
+    <span class="s2">"ID"</span><span class="o">:</span> <span class="mi">8940220481904</span><span class="p">,</span>
+    <span class="s2">"height"</span><span class="o">:</span> <span class="mf">1.77</span><span class="p">,</span>
+    <span class="s2">"weight"</span><span class="o">:</span> <span class="mf">70.0</span><span class="p">,</span>
+    <span class="s2">"known_associates"</span><span class="o">:</span> <span class="p">[</span>
+        <span class="s2">"Jack"</span><span class="p">,</span> <span class="s2">"Mary"</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Running through the parsing code, and you will get an error output:</p>
+
+<pre><code>Parsing failed at offset 127 with error code 16:
+Terminate parsing due to Handler error.
+
+Trace back (last call first):
+(*) Type mismatch between expected type "uint64_t" and actual type "string"
+(*) Error at array element with index 0
+(*) Error at object member with name "known_associates"
+</code></pre>
+
+<p>To programmingly examine the error, you need to query the <code>autojsoncxx::ParsingResult</code> class. Call <code>error_code()</code> and <code>offset()</code> to examine it. When <code>error_code() == rapidjson::kParseErrorTermination</code>, you can also iterate over the <code>autojsoncxx::ParsingResult</code> object for any errors resulting from mapping JSON to C++ types; otherwise the error is a result of malformed JSON, such as missing coma, invalid escape sequence, etc.</p>
+
+<div class="highlight highlight-c++"><pre><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">result</span><span class="p">.</span><span class="n">has_error</span><span class="p">())</span>
+    <span class="k">return</span><span class="p">;</span>
+
+<span class="c1">// equivalent: if (result.error_stack().empty())</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">error_code</span><span class="p">()</span> <span class="o">!=</span> <span class="n">rapidjson</span><span class="o">::</span><span class="n">kParseErrorTermination</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">"Malformed JSON: "</span> <span class="o">&lt;&lt;</span> <span class="n">result</span><span class="p">.</span><span class="n">short_description</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span><span class="p">;</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// equivalent: for (auto&amp;&amp; e: result.error_stack())</span>
+<span class="k">for</span> <span class="p">(</span><span class="k">auto</span><span class="o">&amp;&amp;</span> <span class="nl">e</span> <span class="p">:</span> <span class="n">result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">using</span> <span class="k">namespace</span> <span class="n">autojsoncxx</span><span class="o">::</span><span class="n">error</span><span class="p">;</span>
+
+    <span class="k">switch</span> <span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">type</span><span class="p">())</span> <span class="p">{</span>
+
+    <span class="k">case</span> <span class="nl">UNKNOWN_FIELD</span><span class="p">:</span> <span class="p">{</span>
+        <span class="k">const</span> <span class="n">UnknownFieldError</span><span class="o">&amp;</span> <span class="n">err</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">UnknownFieldError</span><span class="o">&amp;&gt;</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">err</span><span class="p">.</span><span class="n">field_name</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="s">"Version"</span><span class="p">)</span> <span class="o">!=</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">::</span><span class="n">npos</span><span class="p">)</span>
+            <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">"This is a definition of different protocol version</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">break</span><span class="p">;</span>
+
+    <span class="k">case</span> <span class="nl">NUMBER_OUT_OF_RANGE</span><span class="p">:</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="s">"Maybe you should use a 64-bit integer type instead?</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+
+    <span class="k">case</span> <span class="nl">TYPE_MISMATCH</span><span class="p">:</span> <span class="p">{</span>
+        <span class="k">const</span> <span class="n">TypeMismatchError</span><span class="o">&amp;</span> <span class="n">err</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">TypeMismatchError</span><span class="o">&amp;&gt;</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"don't you dare use a "</span> <span class="o">&lt;&lt;</span> <span class="n">err</span><span class="p">.</span><span class="n">actual_type</span><span class="p">()</span>
+                  <span class="o">&lt;&lt;</span> <span class="s">" to fool me!</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">break</span><span class="p">;</span>
+
+    <span class="k">case</span> <span class="nl">OBJECT_MEMBER</span><span class="p">:</span> <span class="p">{</span>
+        <span class="k">const</span> <span class="n">ObjectMemberError</span><span class="o">&amp;</span> <span class="n">err</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">ObjectMemberError</span><span class="o">&amp;&gt;</span><span class="p">(</span><span class="n">e</span><span class="p">);</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"The member "</span> <span class="o">&lt;&lt;</span> <span class="n">err</span><span class="p">.</span><span class="n">member_name</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">" is naughty!</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">break</span><span class="p">;</span>
+
+    <span class="c1">// Many more types of error has been defined, but not shown here for simplicity</span>
+
+    <span class="k">default</span><span class="o">:</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<h2>
+<a name="memory-handling-and-exceptions" class="anchor" href="#memory-handling-and-exceptions"><span class="octicon octicon-link"></span></a>Memory handling and exceptions</h2>
+
+<p>Exception handling (<code>throw</code>, <code>try</code>, <code>catch</code>) is not used by this library, to accommodate the needs of fake C++ programmers. It is designed, however, to be exception safe by using RAII wrappers to do all resource management. Copy, move constructor/assignment operator are disabled at certain places to avoid ownership mismanagement.</p>
+
+<p>Notably, the <code>ParsingResult</code> class is not copyable. This simplifies the memory handling because it fully owns the error stack. It is movable, however, if you define <code>AUTOJSONCXX_HAS_RVALUE</code>. If you ever need to pass it around or store it somewhere, the simpliest way is to use a shared pointer.</p>
+
+<h2>
+<a name="type-support" class="anchor" href="#type-support"><span class="octicon octicon-link"></span></a>Type support</h2>
+
+<p>These types are supported by this library:</p>
+
+<ul>
+<li>Basic types: <code>bool</code>, <code>char</code>, <code>int</code>, <code>unsigned int</code>, <code>long long</code>, <code>unsigned long long</code>, <code>std::string</code>
+</li>
+<li>Array tyeps: <code>std::vector&lt;&gt;</code>, <code>std::deque&lt;&gt;</code>, <code>std::array&lt;&gt;</code>, <code>std::tuple&lt;&gt;</code> (this one needs special care)</li>
+<li>Nullable types: <code>std::nullptr_t</code>, <code>std::unique_ptr&lt;&gt;</code>, <code>std::shared_ptr&lt;&gt;</code>
+</li>
+<li>Map types: <code>std::map&lt;&gt;</code>, <code>std::unordered_map&lt;&gt;</code>, <code>std::multimap&lt;&gt;</code>, <code>std::unordered_multimap&lt;&gt;</code> (The key must be of string type)</li>
+<li>Object types: any class generated by the script <em>autojsoncxx.py</em>.</li>
+</ul><p>Note: <code>char</code> is mapped to JSON <code>Boolean</code> type, the same as <code>bool</code>. This is done so that people can avoid the cariacture that is <code>std::vector&lt;bool&gt;</code>. If you need a character type, use an integer type or a single character string instead.</p>
+
+<p>If you include <code>&lt;autojsoncxx/boost_types.hpp&gt;</code>, you will also get support for</p>
+
+<ul>
+<li>Array types: <code>boost::container::vector&lt;&gt;</code>, <code>boost::container::deque&lt;&gt;</code>, <code>boost::array</code>
+</li>
+<li>Nullable types: <code>boost::shared_ptr&lt;&gt;</code>, <code>boost::optional&lt;&gt;</code>
+</li>
+<li>Map types: <code>boost::unordered_map&lt;&gt;</code>, <code>boost::unordered_multimap&lt;&gt;</code> (The key must be of string type)</li>
+</ul><p><strong>No raw pointer and reference types are supported. Use smart pointers instead</strong>. They do not convey any information about ownership, and will make correct memory management (especially by a code generator) much more difficult.</p>
+
+<h3>
+<a name="complex-types" class="anchor" href="#complex-types"><span class="octicon octicon-link"></span></a>Complex types</h3>
+
+<p>The supported types can be arbitrarily nested, for example</p>
+
+<div class="highlight highlight-c++"><pre><span class="cp">#define AUTOJSONCXX_MODERN_COMPILER 1 </span>
+<span class="cp">#include &lt;iostream&gt;</span>
+<span class="cp">#include "person.hpp"</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">auto</span> <span class="n">test</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_tuple</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;</span><span class="p">{</span> <span class="s">"A"</span><span class="p">,</span> <span class="s">"BC"</span><span class="p">,</span> <span class="s">"DEF"</span> <span class="p">},</span> <span class="k">nullptr</span><span class="p">,</span>
+                                <span class="mf">3.1415926</span><span class="p">,</span> <span class="o">-</span><span class="mi">223</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(),</span>
+                                <span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">,</span> <span class="kt">bool</span><span class="o">&gt;</span><span class="p">{</span> <span class="p">{</span> <span class="s">"a"</span><span class="p">,</span> <span class="nb">true</span> <span class="p">},</span> 
+                                                           <span class="p">{</span> <span class="s">"Δ"</span><span class="p">,</span> <span class="nb">false</span> <span class="p">}</span> <span class="p">},</span>
+                                <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">array</span><span class="o">&lt;</span><span class="n">Person</span><span class="p">,</span> <span class="mi">2</span><span class="o">&gt;&gt;</span><span class="p">());</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">str</span><span class="p">;</span>
+
+    <span class="c1">// This requires true variadic template support </span>
+    <span class="c1">// MSVC 2012 has std::tuple&lt;&gt;, but it is faked with macros</span>
+    <span class="c1">// Avoid std::tuple&lt;&gt; if your compiler is not strong enough</span>
+    <span class="n">autojsoncxx</span><span class="o">::</span><span class="n">to_pretty_json_string</span><span class="p">(</span><span class="n">str</span><span class="p">,</span> <span class="n">test</span><span class="p">);</span>
+
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">str</span> <span class="o">&lt;&lt;</span> <span class="sc">'\n'</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Sample output</p>
+
+<div class="highlight highlight-javascript"><pre><span class="p">[</span>
+    <span class="p">[</span>
+        <span class="s2">"A"</span><span class="p">,</span>
+        <span class="s2">"BC"</span><span class="p">,</span>
+        <span class="s2">"DEF"</span>
+    <span class="p">],</span>
+    <span class="kc">null</span><span class="p">,</span>
+    <span class="mf">3.1415926</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">223</span><span class="p">,</span>
+    <span class="kc">null</span><span class="p">,</span>
+    <span class="p">{</span>
+        <span class="s2">"a"</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+        <span class="s2">"Δ"</span><span class="o">:</span> <span class="kc">false</span>
+    <span class="p">},</span>
+    <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">"ID"</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"anonymous"</span><span class="p">,</span>
+            <span class="s2">"height"</span><span class="o">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">"weight"</span><span class="o">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">"known_associates"</span><span class="o">:</span> <span class="p">[]</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">"ID"</span><span class="o">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"anonymous"</span><span class="p">,</span>
+            <span class="s2">"height"</span><span class="o">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">"weight"</span><span class="o">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">"known_associates"</span><span class="o">:</span> <span class="p">[]</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+
+<h3>
+<a name="self-defined-type" class="anchor" href="#self-defined-type"><span class="octicon octicon-link"></span></a>Self defined type</h3>
+
+<p>The core of the library is two template class, <code>SAXEventHandler</code> and <code>Serializer</code>. The base templates are defined as:</p>
+
+<div class="highlight highlight-c++"><pre><span class="k">namespace</span> <span class="n">autojsoncxx</span> <span class="p">{</span>
+
+<span class="c1">// The core handlers for parsing</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">class</span> <span class="nc">SAXEventHandler</span><span class="p">;</span>
+
+<span class="c1">// Only the second parameter should be specialized</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">Writer</span><span class="p">,</span> <span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+<span class="k">struct</span> <span class="n">Serializer</span><span class="p">;</span>
+
+<span class="p">}</span>
+</pre></div>
+
+<p>Each of the full or partial specialization of these templates will add new type support to the library. </p>
+
+<p>Writing the handler is somewhat difficult, because there are a multitude of errors that can result from a mismatched JSON. So there is some base classes provided, based on <em>Curiously Recurring Template Pattern</em>. For primitive types, such as a simple variant of <code>int</code> and <code>bool</code>, or string types (<code>QString</code>, <code>CString</code>, <code>icu::UnicodeString</code>, <code>YetAnotherStringThatIsSoMuchBetterThanTheRest</code>), derive from <code>BaseSAXEventHandler</code>. There are also base classes for array type <code>VectorBaseSAXEventHandler</code>, nullable type <code>NullableBaseSAXEventHandler</code>, map type <code>MapBaseSAXEventHandler</code>. If you implement your own string, you probably want to add map type support as well, because the default implementation is specialized on <code>std::string</code>.</p>
+
+<p>Writing the serializer is very easy, and one can easily figure it out by looking at the source code.</p>
+
+<h3>
+<a name="about-tuple-types" class="anchor" href="#about-tuple-types"><span class="octicon octicon-link"></span></a>About tuple types</h3>
+
+<p>There are only one tuple type supported <code>std::tuple</code> (<code>boost::tuple</code> is not supported). Implementing it requires true variadic templates, so for most compilers it is not accessible.</p>
+
+<p>If you want to use it, you need to define both <code>AUTOJSONCXX_HAS_MODERN_TYPES</code> and <code>AUTOJSONCXX_HAS_VARIADIC_TEMPLATE</code> to be nonzero. The macro <code>AUTOJSONCXX_MODERN_COMPILER</code> automatically turns on both two.</p>
+
+<p>The tuple type is mapped to a JSON array of heterogenous types. So <code>std::tuple&lt;int, std::string, double&gt;</code> maps to a JSON array of three element of type <code>Number</code>, <code>String</code>, and <code>Number</code> respectively.</p>
+
+<p>During parsing, only the prefix is matched. That is, if the JSON array is longer than the tuple size, the extraneous part will be silently dropped; if the JSON array is shorter than the tuple size, the not-mapped element simply remains untouched. This design is based on the assumption that when you need a heterogeneous array, you probably prioritize flexibility over strict conformance.</p>
+
+<p>Note that the matched part still must have compatible type. Support for variant types is planned.</p>
+
+<h2>
+<a name="c11-features" class="anchor" href="#c11-features"><span class="octicon octicon-link"></span></a>C++11 features</h2>
+
+<p>A set of macros control the usage of c++11 features. Define these macros as nonzero constants <em>before</em> inclusion, or define it in your build system.</p>
+
+<ul>
+<li>
+<code>AUTOJSONCXX_MODERN_COMPILER</code>: turn on all of the below</li>
+<li>
+<code>AUTOJSONCXX_HAS_MODERN_TYPES</code>: add support for c++11 new types, such as <code>std::shared_ptr&lt;&gt;</code>.</li>
+<li>
+<code>AUTOJSONCXX_HAS_RVALUE</code>: enable the use of r-value references and move semantic.</li>
+<li>
+<code>AUTOJSONCXX_HAS_NOEXCEPT</code>: enable the use of keyword <code>noexcept</code> and the function <code>std::move_if_noexcept()</code>.</li>
+<li>
+<code>AUTOJSONCXX_HAS_VARIADIC_TEMPLATE</code>: enable the use of variadic templates. required if <code>std::tuple&lt;&gt;</code> is used.</li>
+<li>
+<code>AUTOJSONCXX_HAS_EXPLICIT_OPERATOR</code>: enable the use of <code>explicit operator bool()</code>. Otherwise no conversion to bool operator is defined.</li>
+</ul><p>The 64-bit integer type <code>long long</code> and <code>unsigned long long</code> is always required. Though not in C++03 standard, most compilers support it nontheless.</p>
+
+<h2>
+<a name="encoding" class="anchor" href="#encoding"><span class="octicon octicon-link"></span></a>Encoding</h2>
+
+<p>The default encoding is <code>UTF-8</code>. If you need to read/write JSON in <code>UTF-16</code> or <code>UTF-32</code>, instantiate the class <code>SAXEventHandler</code> and/or <code>Serializer</code>, and use it in combination with RapidJSON's transcoding capability.</p>
+
+<h2>
+<a name="other" class="anchor" href="#other"><span class="octicon octicon-link"></span></a>Other</h2>
+
+<ul>
+<li>You can have multiple definition of classes in the same file, simply by making the root an array of definitions.</li>
+<li>Remember to fully qualify the type names or otherwise they may not be found. If the compiler still errs or warns about the namespaces, prefix it with global namespace scope resolution operator <code>::</code>, such as <code>::utility::event</code>, <code>::std::vector&lt;::utility::event&gt;</code>.</li>
+</ul><h2>
+<a name="to-do" class="anchor" href="#to-do"><span class="octicon octicon-link"></span></a>To do</h2>
+
+<ul>
+<li>[x] Automatic <s>unit</s> functional testing of the library</li>
+<li>[ ] Test on C++03 compilers</li>
+<li>[x] Test on Microsoft's C++ compiler</li>
+<li>[ ] Automatic detection of compiler support for c++11 features</li>
+<li>[ ] Full documentation about the API</li>
+<li>[x] Map types support</li>
+<li>[ ] Variant types support</li>
+<li>[ ] Properly format the output of code generator</li>
+<li>[ ] Option to separate the class definition and its helper classes in the output</li>
+<li>[x] Option to check the definition file for potential errors, in order to avoid horrid C++ template compile error</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Autojsoncxx maintained by <a href="https://github.com/netheril96">netheril96</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
