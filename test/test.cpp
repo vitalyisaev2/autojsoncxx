@@ -22,9 +22,6 @@
 
 #include <catch.hpp>
 
-#define AUTOJSONCXX_HAS_MODERN_TYPES 1
-#define AUTOJSONCXX_HAS_RVALUE 1
-
 // Uncomment the next line if you are adventurous
 // #define AUTOJSONCXX_HAS_VARIADIC_TEMPLATE 1
 
@@ -32,6 +29,7 @@
 #define AUTOJSONCXX_ROOT_DIRECTORY ".."
 #endif
 
+#include <autojsoncxx/boost_types.hpp>
 #include "userdef.hpp"
 
 #include <fstream>
@@ -119,7 +117,7 @@ TEST_CASE("Test for correct parsing", "[parsing]")
             REQUIRE(u.nickname == "bigger than bigger");
             REQUIRE(u.birthday == create_date(1984, 9, 2));
 
-            REQUIRE(u.block_event.get() != 0);
+            REQUIRE(u.block_event);
             const BlockEvent& e = *u.block_event;
 
             REQUIRE(e.admin_ID > 0ULL);
@@ -143,7 +141,7 @@ TEST_CASE("Test for correct parsing", "[parsing]")
 
     SECTION("Test for a map of user", "[parsing]")
     {
-        std::unordered_map<std::string, User> users;
+        boost::unordered_map<std::string, User> users;
         ParsingResult err;
 
         bool success = from_json_file(AUTOJSONCXX_ROOT_DIRECTORY "/examples/success/user_map.json", users, err);
@@ -159,7 +157,7 @@ TEST_CASE("Test for correct parsing", "[parsing]")
             REQUIRE(u.nickname == "bigger than bigger");
             REQUIRE(u.birthday == create_date(1984, 9, 2));
 
-            REQUIRE(u.block_event.get() != 0);
+            REQUIRE(u.block_event);
             const BlockEvent& e = *u.block_event;
 
             REQUIRE(e.admin_ID > 0ULL);
@@ -184,7 +182,7 @@ TEST_CASE("Test for correct parsing", "[parsing]")
 
 TEST_CASE("Test for mismatch between JSON and C++ class std::vector<config::User>", "[parsing], [error]")
 {
-    std::vector<User> users;
+    boost::container::deque<User> users;
     ParsingResult err;
 
     SECTION("Mismatch between array and object", "[parsing], [error], [type mismatch]")
@@ -196,7 +194,7 @@ TEST_CASE("Test for mismatch between JSON and C++ class std::vector<config::User
         REQUIRE(err.begin()->type() == error::TYPE_MISMATCH);
         REQUIRE(std::distance(err.begin(), err.end()) == 1);
 
-        auto&& e = static_cast<const error::TypeMismatchError&>(*err.begin());
+        const error::TypeMismatchError& e = static_cast<const error::TypeMismatchError&>(*err.begin());
 
         REQUIRE(e.expected_type() == "array");
 
@@ -211,7 +209,7 @@ TEST_CASE("Test for mismatch between JSON and C++ class std::vector<config::User
 
         REQUIRE(std::distance(err.begin(), err.end()) == 5);
 
-        auto it = err.begin();
+        autojsoncxx::error::ErrorStack::const_iterator it = err.begin();
         REQUIRE(it->type() == error::MISSING_REQUIRED);
 
         ++it;
@@ -278,7 +276,7 @@ TEST_CASE("Test for mismatch between JSON and C++ class std::vector<config::User
 
     SECTION("Array length not match the fixed C++ type", "[parsing], [error], [length mismatch]")
     {
-        std::array<User, 3> trinity;
+        boost::array<User, 3> trinity;
 
         REQUIRE(!from_json_file(AUTOJSONCXX_ROOT_DIRECTORY "/examples/success/user_array.json", trinity, err));
         CAPTURE(err.description());
@@ -300,7 +298,7 @@ TEST_CASE("Test for mismatch between JSON and C++ class std::map<std::string, co
 
         REQUIRE(err.begin()->type() == error::TYPE_MISMATCH);
 
-        auto&& e = static_cast<const error::TypeMismatchError&>(*err.begin());
+        const error::TypeMismatchError& e = static_cast<const error::TypeMismatchError&>(*err.begin());
         REQUIRE(e.expected_type() == "object");
         REQUIRE(e.actual_type() == "array");
     }
@@ -313,13 +311,13 @@ TEST_CASE("Test for mismatch between JSON and C++ class std::map<std::string, co
         {
             REQUIRE(err.begin()->type() == error::TYPE_MISMATCH);
 
-            auto&& e = static_cast<const error::TypeMismatchError&>(*err.begin());
+            const error::TypeMismatchError& e = static_cast<const error::TypeMismatchError&>(*err.begin());
         }
         {
-            auto it = ++err.begin();
+            autojsoncxx::error::ErrorStack::const_iterator it = ++err.begin();
             REQUIRE(it != err.end());
             REQUIRE(it->type() == error::OBJECT_MEMBER);
-            auto&& e = static_cast<const error::ObjectMemberError&>(*it);
+            const error::ObjectMemberError& e = static_cast<const error::ObjectMemberError&>(*it);
             REQUIRE(e.member_name() == "Third");
         }
     }

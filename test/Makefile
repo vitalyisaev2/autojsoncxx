@@ -1,4 +1,4 @@
-INCLUDE ?= -I../include -I../rapidjson/include -I../catch/single_include
+INCLUDE ?= -I../include -I../rapidjson/include -I../catch/single_include -I/usr/local/include
 TARGET ?= autojsoncxx_catch
 
 PYTHON3 ?= python3

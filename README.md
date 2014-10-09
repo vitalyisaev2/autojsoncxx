@@ -406,7 +406,7 @@ The default encoding is `UTF-8`. If you need to read/write JSON in `UTF-16` or `
 ## To do
 
 - [x] Automatic <s>unit</s> functional testing of the library
-- [ ] Test on C++03 compilers
+- [x] Test on C++03 compilers
 - [x] Test on Microsoft's C++ compiler
 - [ ] Automatic detection of compiler support for c++11 features
 - [ ] Full documentation about the API
