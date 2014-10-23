@@ -48,7 +48,8 @@ namespace error {
                             NUMBER_OUT_OF_RANGE = 5,
                             ARRAY_LENGTH_MISMATCH = 6,
                             UNKNOWN_FIELD = 7,
-                            DUPLICATE_KEYS = 8;
+                            DUPLICATE_KEYS = 8,
+                            CORRUPTED_DOM = 9;
 
     class ErrorStack;
 
@@ -293,7 +294,7 @@ namespace error {
 
         std::string description() const
         {
-            return "Duplicate key in uniquely keyed mapp type: " + utility::quote(key());
+            return "Duplicate key in uniquely keyed map type: " + utility::quote(key());
         }
     };
 
@@ -357,6 +358,27 @@ namespace error {
         std::string description() const
         {
             return "Unknown field with name: " + utility::quote(field_name());
+        }
+    };
+
+    class CorruptedDOMError : public ErrorBase {
+    private:
+        std::string m_msg;
+
+    public:
+        explicit CorruptedDOMError(std::string msg)
+        {
+            m_msg.swap(msg);
+        }
+
+        std::string description() const
+        {
+            return m_msg;
+        }
+
+        error_type type() const
+        {
+            return CORRUPTED_DOM;
         }
     };
 
@@ -496,7 +518,7 @@ namespace error {
     };
 
     // For argument dependent lookup
-    void swap(ErrorStack& s1, ErrorStack& s2)
+    inline void swap(ErrorStack& s1, ErrorStack& s2)
     {
         s1.swap(s2);
     }
@@ -645,7 +667,7 @@ namespace error {
     }
 
     // For argument dependent lookup
-    void swap(ParsingResult& r1, ParsingResult& r2)
+    inline void swap(ParsingResult& r1, ParsingResult& r2)
     {
         r1.swap(r2);
     }

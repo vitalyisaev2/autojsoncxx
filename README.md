@@ -4,15 +4,16 @@ A header-only library and a code generator to **automagically** translate betwee
 
 ## Overview
 
-JSON is an excellent format for data serialization due to its simplicity, flexibility, portability and human-readable nature. Writing code to parse and generate JSON, however, is not an easy task in a statically typed language. Even with the help of JSON libraries, you need to write a lot of boilerplate code, and convoluted ones if you need to enforce the static typing of C++.
+JSON is an excellent format for data serialization due to its simplicity, flexibility, portability and human-readable nature. Writing code to parse and generate JSON, however, is not an easy task in a statically typed language. Even with the help of JSON libraries, you still need to write a lot of boilerplate code, and convoluted ones if you need to enforce the static typing of C++.
 
-More importantly, manually writing the code means duplication of effort, and duplication is bad for programmers. When your client or PM request a change in feature, many classes (like the class responsible for configuration) will likely change, and you will have to rewrite the code. During the rewrite, time is wasted, people become impatient, and bugs may be introduced when the class definition, parsing and serialization code become out of sync.
+More importantly, manually writing such code means duplication of effort, a violation of **DRY** principle. When manually written, the class definition, parsing and serialization code can easily become out of sync with one another, leading to brittle code and subtle bugs.
 
-*autojsoncxx* is an attempt to solve this problem by automating such process. It is currently still in beta stage, so expect things to change in the future.
+*autojsoncxx* is an attempt to solve this problem by automating such process.
 
 ### Dependency 
 
 * [RapidJSON](https://github.com/miloyip/rapidjson) 
+* [Python](https://www.python.org) (2.7 or 3.3+)
 * (optional) [Parsimonious](https://github.com/erikrose/parsimonious)
 * (optional) [Catch](https://github.com/philsquared/Catch)
 * (optional) [Boost](http://www.boost.org)
@@ -21,7 +22,7 @@ More importantly, manually writing the code means duplication of effort, and dup
 
 * The parsing/serializing code are **automagically** generated. You don't even need to understand what is proper JSON to use it, although it may help you diagnose problems.
 * **Detailed error message**. Not only do you get informed if the JSON is not valid, but you will have a verbose trace back pointing to the location of the problem as well, if the JSON value does not fit your class structure.
-* **Ease of use**. Many convenience functions are added so that a single function call is enough for most use cases. The library as well as its dependency are header only, while the code generator depends only on standard library of Python 3, so no complicated setup for your build system is needed.
+* **Ease of use**. Many convenience functions are added so that a single function call is enough for most use cases. The library as well as its dependency are header only, while the code generator depends only on standard library of Python, so no complicated setup for your build system is needed.
 * **Fast**. The underlying JSON engine (RapidJSON) has been benchmarked to be about an order of magnitude faster than other popular JSON libraries. Besides, this library uses its SAX API, obviating the need of constructing a Document Object Model as the intermediate representation. Lastly, the library utilizes C++ templates to generate the algorithm at compile time, so no overhead of runtime indirection (except when error occurs).
 * **Flexible framework**. You can add more type support to the library by specializing certain template classes. In addition, whenever a class is generated, you can also parse/serialize an array of such class, a nullable wrapper of such class, another class that contains it, etc.
 * **Liberal license**. Both the library and its dependency are licensed liberally (MIT or BSD-like). Anyone is free to copy, distribute, modify or include in their own projects, be it open source or commercial.
@@ -55,7 +56,7 @@ If too many tests fail, make sure your work directory points to the `test` direc
 
 ### Currently tested compilers
 
-* Clang 3.4 on Mac OS X (11.9)
+* Clang 3.4/3.5 on Mac OS X (11.9)
 * GCC 4.9 (Homebrew) on Mac OS X (11.9)
 * Clang 3.0 on Ubuntu 12.04 (x64)
 * GCC 4.8 on Ubuntu 14.04.1 (x86/x64)
@@ -80,15 +81,15 @@ The code generator reads a JSON file that defines the class structure. An exampl
 }
 ```
 
-Run the script *autojsoncxx.py* (requires Python 3) on this definition file, and a header file will be generated. It includes a definition for `Person` as well as some helper classes. The `Person` is a `struct` with all members public, meant as a data holder without any additional functionalities. It can be used with free functions, or [wrapped up in another class to provide encapsulation and polymorphism](https://en.wikipedia.org/wiki/Composition_over_inheritance).
+Run the script *autojsoncxx.py* (requires Python 2.7+, including version 3+) on this definition file, and a header file will be generated. It includes a definition for `Person` as well as some helper classes. The `Person` is a `struct` with all members public, meant as a data holder without any additional functionalities. It can be used with free functions, or [wrapped up in another class to provide encapsulation and polymorphism](https://en.wikipedia.org/wiki/Composition_over_inheritance).
 
 ```bash
-python3 autojsoncxx.py --input=persondef.json --output=person.hpp
+python autojsoncxx.py --input=persondef.json --output=person.hpp
 ```
 
 Remember to add the include directory of *autojsoncxx* and *rapidjson* to your project header search path (no linking is required). 
 
-The below examples uses c++11 features, but the library should also work with c++03 compilers.
+The below examples uses c++11 features, but the library also works with c++03 compilers (provided you do not use new classes from c++11).
 
 ### Serialization
 
@@ -244,6 +245,8 @@ Notably, the `ParsingResult` class is not copyable. This simplifies the memory h
 
 ## Type support
 
+### Predefined types
+
 These types are supported by this library:
 
 * Basic types: `bool`, `char`, `int`, `unsigned int`, `long long`, `unsigned long long`, `std::string`
@@ -251,10 +254,13 @@ These types are supported by this library:
 * Nullable types: `std::nullptr_t`, `std::unique_ptr<>`, `std::shared_ptr<>`
 * Map types: `std::map<>`, `std::unordered_map<>`, `std::multimap<>`, `std::unordered_multimap<>` (The key must be of string type)
 * Object types: any class generated by the script *autojsoncxx.py*.
+* DOM: `rapidjson::Document`
 
-Note: `char` is mapped to JSON `Boolean` type, the same as `bool`. This is done so that people can avoid the caricature that is `std::vector<bool>`. If you need a character type, use an integer type or a single character string instead.
+Notes: 
 
-If you include `<autojsoncxx/boost_types.hpp>`, you will also get support for
+* `char` is mapped to JSON `Boolean` type, the same as `bool`. 
+
+If you include `<autojsoncxx/boost_types.hpp>` (a relatively new `boost` is required), you will also get support for
 
 * Array types: `boost::container::vector<>`, `boost::container::deque<>`, `boost::array`
 * Nullable types: `boost::shared_ptr<>`, `boost::optional<>`
@@ -262,7 +268,7 @@ If you include `<autojsoncxx/boost_types.hpp>`, you will also get support for
 
 **No raw pointer and reference types are supported. Use smart pointers instead**. They do not convey any information about ownership, and will make correct memory management (especially by a code generator) much more difficult.
 
-### Complex types
+### Nested types
 
 The supported types can be arbitrarily nested, for example
 
@@ -350,17 +356,21 @@ Writing the handler is somewhat difficult, because there are a multitude of erro
 
 Writing the serializer is very easy, and one can easily figure it out by looking at the source code.
 
-### About tuple types
+### Special types
 
-There are only one tuple type supported `std::tuple` (`boost::tuple` is not supported). Implementing it requires true variadic templates, so for most compilers it is not accessible.
+#### Tuple
 
-If you want to use it, you need to define both `AUTOJSONCXX_HAS_MODERN_TYPES` and `AUTOJSONCXX_HAS_VARIADIC_TEMPLATE` to be nonzero. The macro `AUTOJSONCXX_MODERN_COMPILER` automatically turns on both two.
+There are only one tuple type supported `std::tuple` (`boost::tuple` is not supported). Implementing it requires true variadic templates. If you want to use it, you need to define both `AUTOJSONCXX_HAS_MODERN_TYPES` and `AUTOJSONCXX_HAS_VARIADIC_TEMPLATE` to be nonzero. The macro `AUTOJSONCXX_MODERN_COMPILER` automatically turns on both two.
 
 The tuple type is mapped to a JSON array of heterogenous types. So `std::tuple<int, std::string, double>` maps to a JSON array of three element of type `Number`, `String`, and `Number` respectively.
 
 During parsing, only the prefix is matched. That is, if the JSON array is longer than the tuple size, the extraneous part will be silently dropped; if the JSON array is shorter than the tuple size, the not-mapped element simply remains untouched. This design is based on the assumption that when you need a heterogeneous array, you probably prioritize flexibility over strict conformance.
 
-Note that the matched part still must have compatible type. Support for variant types is planned.
+#### DOM
+
+`rapidjson::Document` is the only DOM type supported. The envisioned use is to freely intermix static and dynamic typing. That is, part of a C++ struct is converted according to strict rules, while other part are flexibly handled.
+
+In addition, you can convert any supported type to/from a DOM object directly. The relevant functions are surprisingly named `autojsoncxx::to_document` and `autojsoncxx::from_document`.
 
 ## Definition file syntax
 
@@ -415,4 +425,3 @@ The default encoding is `UTF-8`. If you need to read/write JSON in `UTF-16` or `
 - [ ] Properly format the output of code generator
 - [ ] Option to separate the class definition and its helper classes in the output
 - [x] Option to check the definition file for potential errors, in order to avoid horrid C++ template compile error
-
