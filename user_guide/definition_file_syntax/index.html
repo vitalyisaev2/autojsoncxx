@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+
+        <title>Definition file syntax - autojsoncxx</title>
+
+        <link href="../../css/bootstrap-3.0.3.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link href="../../css/prettify-1.0.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Collapsed navigation -->
+        <div class="navbar-header">
+            <!-- Expander button -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Main title -->
+            <a class="navbar-brand" href="../..">autojsoncxx</a>
+        </div>
+
+        <!-- Expanded navigation -->
+        <div class="navbar-collapse collapse">
+            <!-- Main navigation -->
+            <ul class="nav navbar-nav">
+            
+            
+                <li >
+                    <a href="../../tutorial/">Tutorial</a>
+                </li>
+            
+            
+            
+                <li class="dropdown active">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">User guide <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                    
+                        <li class="active">
+                            <a href="./">Definition file syntax</a>
+                        </li>
+                    
+                        <li >
+                            <a href="../error_handling/">Error handling</a>
+                        </li>
+                    
+                        <li >
+                            <a href="../miscellaneous/">Miscellaneous</a>
+                        </li>
+                    
+                        <li >
+                            <a href="../type_support/">Type support</a>
+                        </li>
+                    
+                    </ul>
+                </li>
+            
+            
+            </ul>
+
+            <!-- Search, Navigation and Repo links -->
+            <ul class="nav navbar-nav navbar-right">
+                
+                <li >
+                    <a rel="next" href="../../tutorial/">
+                        <i class="fa fa-arrow-left"></i> Previous
+                    </a>
+                </li>
+                <li >
+                    <a rel="prev" href="../error_handling/">
+                        Next <i class="fa fa-arrow-right"></i>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="https://github.com/netheril96/autojsoncxx">
+                        
+                            <i class="fa fa-github"></i>
+                        
+                        GitHub
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+
+        <div class="container">
+            <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#definition-file-syntax">Definition file syntax</a></li>
+        
+            <li><a href="#class-definition">Class definition</a></li>
+        
+            <li><a href="#member-definition">Member definition</a></li>
+        
+    
+    </ul>
+</div></div>
+            <div class="col-md-9" role="main">
+
+<h2 id="definition-file-syntax">Definition file syntax</h2>
+<p>The definition file is a simple JSON file that lists all the classes, their members as well as options to control the parsing. The root must be an object corresponding to a class definition, or an array of such objects.</p>
+<h3 id="class-definition">Class definition</h3>
+<p>A class definition is an object with the following fields:</p>
+<ul>
+<li><strong>name</strong>. The unqualified name of the class.</li>
+<li><strong>namespace</strong>. (optional). The full namespace of this class, such as <code>mycompany::data</code> or <code>::mycompany::data</code>. When not set, the class is put in the global namespace.</li>
+<li><strong>parse_mode</strong> (optional). "strict" or otherwise, default "". When set to strict, any unrecognized JSON key will cause an <code>UnknownFieldError</code>. Otherwise they are simply ignored. The default is ignoring, so that you can upgrade your protocol by appending new fields without affecting old applications.</li>
+<li><strong>constructor_code</strong>. (optional). Arbitrary C++ code to execute in the constructor, useful if you need to perform initialization that cannot be done with the <code>default</code> option.</li>
+<li><strong>comment</strong> (optional). Ignored.</li>
+<li><strong>members</strong>. An array of member definitions.</li>
+</ul>
+<h3 id="member-definition">Member definition</h3>
+<p>A member definition is a JSON array of two or three elements. The first two is "positional arguments", referring to the <em>fully qualified</em> type name and the variable name, mimicking the declaration order in C++. The third element, if any, is a JSON object with one or more of the following keys:</p>
+<ul>
+<li><strong>required</strong>. true/false (default: false). When set to true, the lack of such field in the JSON triggers <code>MissingFieldError</code>. If you want to know whether a certain key is present but not wanting the errors, you can use a nullable wrapper.</li>
+<li><strong>default</strong>. A boolean, number or string, used to initialize this field. When not set, the field is value initialized in the constructor.</li>
+<li><strong>json_key</strong>. The corresponding key in JSON. When not set, it is the same as the variable name.</li>
+<li><strong>comment</strong>. Ignored.</li>
+</ul>
+</div>
+        </div>
+
+        
+
+        <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/prettify-1.0.min.js"></script>
+        <script src="../../js/base.js"></script>
+    </body>
+</html>
