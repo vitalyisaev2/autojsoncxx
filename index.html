@@ -126,6 +126,8 @@
         
             <li><a href="#documentation">Documentation</a></li>
         
+            <li><a href="#credit">Credit</a></li>
+        
     
     </ul>
 </div></div>
@@ -139,7 +141,7 @@
 <p><em>autojsoncxx</em> is an attempt to solve this problem by automating such process.</p>
 <h3 id="dependency">Dependency</h3>
 <ul>
-<li><a href="https://github.com/miloyip/rapidjson">RapidJSON</a> </li>
+<li><a href="https://github.com/miloyip/rapidjson">RapidJSON</a></li>
 <li><a href="https://www.python.org">Python</a> (2.7 or 3.3+)</li>
 <li>(optional) <a href="https://github.com/erikrose/parsimonious">Parsimonious</a></li>
 <li>(optional) <a href="https://github.com/philsquared/Catch">Catch</a></li>
@@ -168,7 +170,7 @@ git submodule update
 make test
 </code></pre>
 
-<p><em>Windows users</em>: </p>
+<p><em>Windows users</em>:</p>
 <p>Generate the <code>test/userdef.hpp</code> file from the definition <code>examples/userdef.json</code>. Then open the solution file under <code>test/mscvXX_test/</code> to build and run the test.</p>
 <p>If too many tests fail, make sure your work directory points to the <code>test</code> directory.</p>
 <h3 id="currently-tested-compilers">Currently tested compilers</h3>
@@ -195,7 +197,7 @@ make test
 }
 </code></pre>
 
-<p>Run the script <em>autojsoncxx.py</em> (requires Python 2.7+, including version 3+) on this definition file, and a header file will be generated. It includes a definition for <code>Person</code> as well as some helper classes. </p>
+<p>Run the script <em>autojsoncxx.py</em> (requires Python 2.7+, including version 3+) on this definition file, and a header file will be generated. It includes a definition for <code>Person</code> as well as some helper classes.</p>
 <pre class="prettyprint well"><code class="bash">python autojsoncxx.py --input=persondef.json --output=person.hpp
 </code></pre>
 
@@ -239,8 +241,11 @@ Trace back (last call first):
 (*) Error at object member with name &quot;known_associates&quot;
 </code></pre>
 
+<p>One can also <a href="https://netheril96.github.io/autojsoncxx/user_guide/error_handling/">query the errors programmingly</a>.</p>
 <h2 id="documentation">Documentation</h2>
 <p>Read more <a href="https://netheril96.github.io/autojsoncxx/tutorial">here</a>.</p>
+<h2 id="credit">Credit</h2>
+<p>This project is inspired by <a href="https://developers.google.com/protocol-buffers/">google protobuf</a>. It adopts the same approach in protobuf (compiler + definition file), and borrows various parse options from it.</p>
 </div>
         </div>
 
