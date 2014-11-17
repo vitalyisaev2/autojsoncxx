@@ -176,7 +176,7 @@ namespace utility {
             return *ptr;
         }
 
-        void reset(pointer_type p)
+        void reset(pointer_type p = 0)
         {
             Deleter()(ptr);
             ptr = p;
@@ -356,7 +356,7 @@ namespace utility {
 
             current_size = num_elements_per_node;
             node* next = head->next;
-            delete head;
+            operator delete(head);
             head = next;
         }
 
@@ -375,7 +375,8 @@ namespace utility {
         T& emplace()
         {
             if (current_size == num_elements_per_node) {
-                node* new_node = new node;
+                // operator new always return memory maximumly aligned
+                node* new_node = static_cast<node*>(operator new(sizeof(*new_node)));
                 new_node->next = head;
                 head = new_node;
                 current_size = 0;
@@ -423,6 +424,13 @@ namespace utility {
             --total_size;
         }
 
+        void clear()
+        {
+            while (head)
+                deallocate_current_node();
+            head = 0;
+        }
+
         bool empty() const AUTOJSONCXX_NOEXCEPT
         {
             return total_size == 0;
@@ -435,8 +443,7 @@ namespace utility {
 
         ~stack()
         {
-            while (head)
-                deallocate_current_node();
+            clear();
         }
     };
 }

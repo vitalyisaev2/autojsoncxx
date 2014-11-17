@@ -31,14 +31,13 @@ import argparse
 import os
 import hashlib
 import sys
+import io
+from numbers import Number
 
 
 # Python 2/3 compatibility layer
 is_python2 = sys.version_info.major == 2
 if is_python2:
-    import io
-
-    open = io.open
     str = unicode
 
 # simplejson has the same interface as the standard json module, but with better error messages
@@ -246,8 +245,10 @@ class MemberInfo:
             return 'false'
         elif isinstance(args, str):
             return cstring_literal(args.encode('utf-8'))
-        elif isinstance(args, int) or isinstance(args, float):
+        elif isinstance(args, Number):
             return str(args)
+        elif isinstance(args, bytes):
+            return cstring_literal(args)
         else:
             raise UnrecognizedOption("default=" + repr(args))
 
@@ -326,6 +327,9 @@ class HelperClassCodeGenerator:
         else:
             return ''
 
+    def prepare_for_reuse(self):
+        return ''.join('handler_{}.PrepareForReuse();\n'.format(i) for i in range(len(self.members_info)))
+
 
 class CPPTypeNameChecker:
     # PEG grammar for parsing the C++ type name we support
@@ -364,12 +368,13 @@ class CPPTypeNameChecker:
         self._grammar = parsimonious.Grammar(CPPTypeNameChecker.PEG_GRAMMAR)
         self._known_names = set(CPPTypeNameChecker.KNOWN_BASIC_TYPE_NAMES)
 
-    def extract_simple_type(self, node):
+    @staticmethod
+    def __extract_simple_type(node):
         if node.expr_name == 'simple_type':
             yield node.text.lstrip(':')
 
         for sub_node in node.children:
-            for value in self.extract_simple_type(sub_node):
+            for value in CPPTypeNameChecker.__extract_simple_type(sub_node):
                 yield value
 
     def check_for_unknown_basic_types(self, name):
@@ -378,9 +383,8 @@ class CPPTypeNameChecker:
         :return: a list of unknown basic types
         """
         node = self.grammar.parse(name)
-        simple_types = set(self.extract_simple_type(node))
-        unknowns = simple_types - self.known_names
-        return unknowns
+        simple_types = set(self.__extract_simple_type(node))
+        return simple_types - self.known_names
 
     @property
     def grammar(self):
@@ -407,7 +411,9 @@ def build_class(template, class_info):
         "handle unknown key": gen.unknown_key_handling(),
         "TypeName": class_info.qualified_name,
         "count of members": gen.count_of_members(),
-        "Writer": gen.writer_type_name()}
+        "Writer": gen.writer_type_name(),
+        "call PrepareForReuse": gen.prepare_for_reuse()
+    }
 
     def evaluate(match):
         try:
@@ -468,12 +474,12 @@ def main():
     else:
         checker = None
 
-    with open(args.template) as f:
+    with io.open(args.template, encoding='utf-8') as f:
         template = f.read()
-    with open(args.input) as f:
+    with io.open(args.input, encoding='utf-8') as f:
         raw_record = json.load(f)
 
-    with open(args.output, 'w') as output:
+    with io.open(args.output, 'w', encoding='utf-8') as output:
         output.write('#pragma once\n\n')
 
         def output_class(class_record):
