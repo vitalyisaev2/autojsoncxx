@@ -202,10 +202,6 @@ class MemberInfo(object):
         if len(record) > 3:
             raise UnrecognizedOption(record[3:])
 
-        if len(record) == 3:
-            for op in record[2]:
-                if op not in MemberInfo.accept_options:
-                    raise UnrecognizedOption(op)
 
     @property
     def type_name(self):
