@@ -189,7 +189,7 @@ class ClassDefinitionCodeGenerator(object):
 
 
 class MemberInfo(object):
-    accept_options = {'default', 'required', 'json_key', 'comment'}
+    accept_options = {'default', 'required', 'json_key', 'comment', 'minLength', 'maxLength', 'pattern', 'format', 'enum', 'oneOf','containerTypeProperty', 'minimum', 'maximum', 'minItems', 'maxItems', 'uniqueItems'}
 
     def __init__(self, record):
         self._record = record
