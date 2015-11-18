@@ -189,7 +189,7 @@ class ClassDefinitionCodeGenerator(object):
 
 
 class MemberInfo(object):
-    accept_options = {'default', 'required', 'json_key', 'comment', 'minLength', 'maxLength', 'pattern', 'format', 'enum', 'oneOf','containerTypeProperty', 'minimum', 'maximum', 'minItems', 'maxItems', 'uniqueItems'}
+    accept_options = {'required', 'json_key', 'comment', 'minLength', 'maxLength', 'pattern', 'format', 'enum', 'oneOf','containerTypeProperty', 'minimum', 'maximum', 'minItems', 'maxItems', 'uniqueItems'}
 
     def __init__(self, record):
         self._record = record
@@ -224,10 +224,7 @@ class MemberInfo(object):
 
     @property
     def is_required(self):
-        try:
-            return self._record[2]['required']
-        except (IndexError, KeyError):
-            return False
+        return self._record[2]['required']
 
     @property
     def default(self):
