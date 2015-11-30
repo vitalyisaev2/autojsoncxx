@@ -514,6 +514,7 @@ def main():
 
         if isinstance(raw_record, list):
             for r in raw_record:
+                print("Processing:", r)
                 output_class(r)
         else:
             output_class(raw_record)
