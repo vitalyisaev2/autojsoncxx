@@ -14,10 +14,10 @@
     "namespace": "config::event",
     "members": [
         ["unsigned long long", "serial_number", {"required": true}],
-        ["unsigned long long", "admin_ID", {"json_key": "administrator ID", "default": 255}],
-        ["Date", "date"],
-        ["std::string", "description", {"default": "/* init */ trying to mess up with the code generator"}],
-        ["std::string", "details"]
+        ["unsigned long long", "admin_ID", {"required": false, "json_key": "administrator ID", "default": 255}],
+        ["Date", "date", {"required": false}],
+        ["std::string", "description", {"required": false, "default": "/* init */ trying to mess up with the code generator"}],
+        ["std::string", "details", {"required": false}]
     ],
     "constructor_code": "date.year = 1970; date.month = 1; date.day = 1; /* Assign date to the UNIX epoch */"
 },
@@ -29,10 +29,10 @@
     "members": [
         ["unsigned long long", "ID", {"required": true}],
         ["std::string", "nickname", {"required": true, "default": "❶❷❸"} ],
-        ["Date", "birthday"],
-        ["std::shared_ptr<config::event::BlockEvent>", "block_event"],
-        ["std::vector<config::event::BlockEvent>", "dark_history"],
-        ["std::map<std::string, std::string>", "optional_attributes"]
+        ["Date", "birthday", {"required": false}],
+        ["std::shared_ptr<config::event::BlockEvent>", "block_event", {"required": false}],
+        ["std::vector<config::event::BlockEvent>", "dark_history", {"required": false}],
+        ["std::map<std::string, std::string>", "optional_attributes", {"required": false}]
     ]
 }
 ]
