@@ -189,7 +189,7 @@ class ClassDefinitionCodeGenerator(object):
 
 
 class MemberInfo(object):
-    accept_options = {'required', 'json_key', 'comment', 'minLength', 'maxLength', 'pattern', 'format', 'enum', 'oneOf','containerTypeProperty', 'minimum', 'maximum', 'minItems', 'maxItems', 'uniqueItems'}
+    accept_options = {'default', 'required', 'json_key', 'comment', 'minLength', 'maxLength', 'pattern', 'format', 'enum', 'oneOf','containerTypeProperty', 'minimum', 'maximum', 'minItems', 'maxItems', 'uniqueItems'}
 
     def __init__(self, record):
         self._record = record
@@ -510,6 +510,7 @@ def main():
 
         if isinstance(raw_record, list):
             for r in raw_record:
+                print("Processing:", r)
                 output_class(r)
         else:
             output_class(raw_record)
